@@ -63,7 +63,8 @@ export const STORAGE = {
   orders: new Map<string, StoredOrder>(),
   pdfRecords: new Map<string, StoredPDFRecord>(),
   analysisIdToUserId: new Map<string, string>(), // Quick lookup
-};
+  personalizationDataCache: new Map<string, any>(), // Cache for personalization data during purchase flow
+} as any;
 
 // ==========================================
 // USER MANAGEMENT
