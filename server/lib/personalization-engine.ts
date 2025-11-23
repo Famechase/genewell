@@ -1,4 +1,4 @@
-import { WellnessQuiz } from "../../shared/api";
+// Personalization engine doesn't need shared/api imports - it's standalone
 
 export interface UserProfile {
   // Personal info
