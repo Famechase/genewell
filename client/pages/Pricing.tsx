@@ -431,7 +431,7 @@ export default function Pricing() {
 
               <CardContent className="space-y-6">
                 <Button
-                  onClick={() => handleBuyClick(plan.name)}
+                  onClick={() => handleBuyClick(plan.id)}
                   className={`w-full ${
                     plan.popular
                       ? "bg-wellness-gradient hover:opacity-90"
