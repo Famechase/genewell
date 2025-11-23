@@ -295,14 +295,14 @@ export default function Pricing() {
     navigate(-1);
   };
 
-  const handleBuyClick = (planName: string) => {
+  const handleBuyClick = (planId: string) => {
     const quizCompleted = localStorage.getItem("analysisId");
     if (!quizCompleted) {
-      setSelectedPlan(planName);
+      setSelectedPlan(planId);
       setQuizGateOpen(true);
     } else {
-      // User has completed quiz, redirect to download
-      navigate("/download");
+      // User has completed quiz, redirect to download with plan selected
+      navigate(`/download?plan=${planId}`);
     }
   };
 
