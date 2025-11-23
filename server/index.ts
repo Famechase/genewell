@@ -14,10 +14,20 @@ import {
   handleWellnessPayment,
   handleWellnessDownload,
   handleProductDownload,
+  handleWellnessPurchase,
+  handlePDFDownload,
+  handlePDFDownloadBase64,
+  handleListUserPDFs,
+  handleUserDashboard,
+  handleStorageStats,
 } from "./routes/wellness";
+import { startCleanupJob } from "./lib/storage";
 
 export function createServer() {
   const app = express();
+
+  // Start cleanup job for expired PDFs
+  startCleanupJob();
 
   // Middleware
   app.use(cors());
@@ -49,12 +59,20 @@ export function createServer() {
   app.get("/api/dashboard", handleGetDashboard);
   app.get("/api/dashboard/progress", handleGetProgressStats);
 
-  // Wellness quiz routes
+  // Wellness quiz routes - NEW PERSONALIZATION SYSTEM
   app.post("/api/wellness/quiz", handleWellnessQuizSubmission);
+  app.post("/api/wellness/purchase", handleWellnessPurchase);
+  app.get("/api/wellness/download-pdf/:pdfRecordId", handlePDFDownload);
+  app.get("/api/wellness/download-pdf-base64/:pdfRecordId", handlePDFDownloadBase64);
+  app.get("/api/wellness/pdfs", handleListUserPDFs);
+  app.get("/api/wellness/dashboard/:userId", handleUserDashboard);
+  app.get("/api/wellness/stats", handleStorageStats);
+
+  // Legacy wellness routes (for backward compatibility)
   app.post("/api/wellness/payment", handleWellnessPayment);
   app.get("/api/wellness/download/:analysisId", handleWellnessDownload);
 
-  // Product download routes
+  // Product download routes (legacy)
   app.get("/api/products/download/:productId", handleProductDownload);
 
   return app;
