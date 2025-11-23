@@ -1,4 +1,4 @@
-// Personalization engine doesn't need shared/api imports - it's standalone
+// Personalization engine - works with quiz data objects
 
 export interface UserProfile {
   // Personal info
