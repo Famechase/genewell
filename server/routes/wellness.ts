@@ -20,7 +20,7 @@ import {
   getUserDashboard,
   getPDFRecordsByUserId,
 } from "../lib/storage";
-import { products, getProductById, Product } from "../../client/lib/products";
+import { getProductById } from "../../client/lib/products";
 
 // Helper to generate analysis ID
 function generateAnalysisId(): string {
