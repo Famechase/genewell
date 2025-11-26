@@ -871,47 +871,43 @@ export default function Quiz() {
       </div>
 
       {/* Sticky Navigation Buttons at Bottom - Always Visible */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 px-4 py-4 z-40">
-        <div className="max-w-3xl mx-auto flex justify-between gap-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 px-4 py-3 z-40">
+        <div className="max-w-3xl mx-auto flex justify-between gap-3">
           <Button
             variant="outline"
             onClick={handlePrevious}
             disabled={currentStep === 0}
-            className="flex-1 px-6 py-3 text-lg"
+            className="flex-1 px-4 py-2 text-sm"
           >
-            <ArrowLeft className="mr-2 h-5 w-5" />
-            {language === "en" ? "Previous" : "पिछला"}
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            {language === "en" ? "Prev" : "पिछला"}
           </Button>
 
           <Button
             onClick={handleNext}
             disabled={!isStepValid() || isSubmitting}
-            className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 text-lg"
+            className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 text-sm"
           >
             {isSubmitting ? (
-              language === "en" ? (
-                "Creating Blueprint..."
-              ) : (
-                "योजना बनाई जा रही है..."
-              )
+              <span className="text-xs">Creating...</span>
             ) : currentStep === quizQuestions.length - 1 ? (
               <>
-                <CheckCircle className="mr-2 h-5 w-5" />
-                {language === "en" ? "Get My Blueprint" : "मेरी योज��ा पाएं"}
+                <CheckCircle className="mr-2 h-4 w-4" />
+                {language === "en" ? "Get Blueprint" : "पाएं"}
               </>
             ) : (
               <>
                 {language === "en" ? "Next" : "अगला"}
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-4 w-4" />
               </>
             )}
           </Button>
         </div>
         {!isStepValid() && (
-          <p className="text-center text-red-600 text-sm mt-2">
+          <p className="text-center text-red-600 text-xs mt-1">
             {language === "en"
-              ? "Please select an answer to continue"
-              : "कृपया जारी रखने के लिए एक उत्तर चुनें"}
+              ? "Select an answer to continue"
+              : "उत्तर चुनें"}
           </p>
         )}
       </div>
