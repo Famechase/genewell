@@ -72,18 +72,25 @@ export async function generatePersonalizedPDF(
 
   // === COVER PAGE ===
   doc
-    .fontSize(32)
+    .fontSize(28)
     .font("Helvetica-Bold")
     .fillColor("#7c3aed")
     .text("Your Wellness Blueprint");
 
+  doc.moveDown(0.3);
+  doc
+    .fontSize(22)
+    .font("Helvetica-Bold")
+    .fillColor("#111827")
+    .text(`${profile.name}`);
+
   doc.moveDown(0.5);
   doc
-    .fontSize(18)
+    .fontSize(14)
     .font("Helvetica")
     .fillColor("#4a5568")
     .text(
-      `${profile.name} • ${tier.charAt(0).toUpperCase() + tier.slice(1)} Plan`
+      `${tier.charAt(0).toUpperCase() + tier.slice(1)} Plan — Personalized for You`
     );
 
   doc.moveDown(1);
