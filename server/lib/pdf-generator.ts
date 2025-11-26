@@ -721,7 +721,8 @@ export async function generatePersonalizedPDF(
     doc.on("end", () => resolve(Buffer.concat(chunks)));
   });
 
-  const filename = `${profile.name.toLowerCase().replace(/\s+/g, "-")}_wellness-blueprint_${orderId}.pdf`;
+  const sanitizedName = profile.name.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
+  const filename = `${sanitizedName}_${tier}_blueprint_${orderId}.pdf`;
 
   return {
     buffer,
