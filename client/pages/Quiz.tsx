@@ -641,7 +641,7 @@ export default function Quiz() {
       </header>
 
       {/* Main Content - Centered and Scrollable */}
-      <div id="quiz-content" className="flex-1 overflow-y-auto pb-32">
+      <div id="quiz-content" className="flex-1 overflow-y-auto pb-24">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Progress */}
         <div className="mb-8">
@@ -897,7 +897,7 @@ export default function Quiz() {
             ) : currentStep === quizQuestions.length - 1 ? (
               <>
                 <CheckCircle className="mr-2 h-5 w-5" />
-                {language === "en" ? "Get My Blueprint" : "मेरी योजना पाएं"}
+                {language === "en" ? "Get My Blueprint" : "मेरी योज��ा पाएं"}
               </>
             ) : (
               <>
