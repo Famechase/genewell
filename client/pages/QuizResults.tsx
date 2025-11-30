@@ -53,8 +53,8 @@ const planFeatures = {
     name: "Essential Blueprint",
     price: 999,
     features: [
-      "Advanced lifestyle & body composition analysis",
-      "Ayurvedic constitution mapping",
+      "Advanced lifestyle & nutrition analysis",
+      "Evidence-based macro & calorie targets",
       "15-page personalized PDF blueprint",
       "Customized 7-day meal plan",
       "Home-based workout routines",
