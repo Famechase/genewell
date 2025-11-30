@@ -474,9 +474,9 @@ export default function Download() {
                     Personalized Analysis
                   </h3>
                   <ul className="space-y-2 text-sm text-gray-600">
-                    <li>✅ Your metabolic profile</li>
-                    <li>✅ Ayurvedic constitution (Vata/Pitta/Kapha)</li>
-                    <li>✅ Body type classification</li>
+                    <li>✅ Your metabolic profile (BMR & TDEE)</li>
+                    <li>✅ Circadian rhythm & energy patterns</li>
+                    <li>✅ Personalized macronutrient targets</li>
                     <li>✅ Energy & wellness scores</li>
                     <li>✅ Recommended blood tests</li>
                   </ul>
