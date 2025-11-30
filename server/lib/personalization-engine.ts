@@ -1,4 +1,5 @@
 // Personalization engine - works with quiz data objects
+// 100% evidence-based science: Exercise physiology, nutrition science, sleep neurobiology, behavioral psychology, stress neuroscience
 
 export interface UserProfile {
   // Personal info
@@ -7,51 +8,47 @@ export interface UserProfile {
   age: number;
   gender: "male" | "female" | "non-binary" | "prefer-not-to-say";
 
-  // Body metrics (derived from quiz or estimated)
-  bodyType: "ectomorph" | "mesomorph" | "endomorph" | "not-sure";
-  metabolismType: "fast" | "moderate" | "slow";
-  ayurvedicType: "vata" | "pitta" | "kapha" | "mixed";
-
-  // Scores
-  stressScore: number; // 1-100
-  sleepScore: number; // 1-100
-  activityScore: number; // 1-100
-  energyScore: number; // 1-100
-
-  // Metabolic data
-  estimatedBMR: number; // Basal Metabolic Rate
+  // Body metrics - evidence-based, Mifflin-St Jeor and Harris-Benedict models
+  estimatedHeightCm: number;
+  estimatedWeightKg: number;
+  estimatedBMR: number; // Basal Metabolic Rate (science-based)
   estimatedTDEE: number; // Total Daily Energy Expenditure
-  proteinGrams: number; // Daily protein recommendation
-  carbsGrams: number; // Daily carbs recommendation
-  fatsGrams: number; // Daily fats recommendation
 
-  // Health flags
+  // Macronutrients
+  proteinGrams: number;
+  carbsGrams: number;
+  fatsGrams: number;
+
+  // Health & Lifestyle scores (1-100)
+  stressScore: number;
+  sleepScore: number;
+  activityScore: number;
+  energyScore: number;
+
+  // Health conditions & preferences
   medicalConditions: string[];
   digestiveIssues: string[];
   foodIntolerances: string[];
   skinConcerns: string[];
-
-  // Preferences
   dietaryPreference: string;
   exercisePreference: string[];
   workSchedule: string;
   region: string;
 
-  // DNA
-  dnaConsent: boolean;
-
-  // Recommendations
+  // Health data
   recommendedTests: string[];
   supplementPriority: string[];
   exerciseIntensity: "low" | "moderate" | "high";
   mealFrequency: number;
+
+  // DNA consent (optional biomarker testing)
+  dnaConsent: boolean;
 }
 
 export interface PersonalizationData {
   profile: UserProfile;
   insights: {
     metabolicInsight: string;
-    ayurvedicInsight: string;
     recommendedMealTimes: string[];
     calorieRange: { min: number; max: number };
     macroRatios: { protein: number; carbs: number; fats: number };
@@ -62,200 +59,215 @@ export interface PersonalizationData {
   };
 }
 
-const AYURVEDIC_CHARACTERISTICS = {
-  vata: {
-    traits: [
-      "Thin, light frame",
-      "Quick, restless mind",
-      "Dry skin and hair",
-      "Irregular digestion",
-      "Variable energy",
-      "Cold hands and feet",
-    ],
-    recommendations: {
-      foods: ["Warm foods", "Cooked vegetables", "Ghee", "Healthy oils", "Root vegetables"],
-      avoid: ["Cold drinks", "Raw foods", "Excessive caffeine", "Dry snacks"],
-      meals: "Regular, warm meals; 2-3 per day",
-      activities: "Gentle yoga, walking, grounding practices",
-      supplements: ["Ashwagandha", "Sesame oil", "Triphala", "Warming spices"],
-    },
-  },
-  pitta: {
-    traits: [
-      "Medium frame",
-      "Sharp intellect",
-      "Good appetite",
-      "Strong digestion",
-      "Warm body temperature",
-      "Ambitious nature",
-    ],
-    recommendations: {
-      foods: ["Cooling foods", "Coconut", "Cucumber", "Mint", "Bitter vegetables"],
-      avoid: ["Spicy foods", "Excess heat", "Fermented foods", "Too much salt"],
-      meals: "Moderate, timely meals; 3 per day optimal",
-      activities: "Moderate cardio, swimming, cooling yoga",
-      supplements: ["Brahmi", "Ashwagandha", "Cooling herbs", "Coconut oil"],
-    },
-  },
-  kapha: {
-    traits: [
-      "Fuller frame",
-      "Steady mind",
-      "Oily skin",
-      "Strong digestion",
-      "Slow metabolism",
-      "Patient, calm nature",
-    ],
-    recommendations: {
-      foods: ["Light foods", "Ginger", "Spices", "Bitter vegetables", "Whole grains"],
-      avoid: ["Heavy foods", "Dairy excess", "Cold foods", "Fried foods"],
-      meals: "Light, frequent meals; 2-3 per day",
-      activities: "Vigorous exercise, dancing, stimulating activities",
-      supplements: ["Ginger", "Black pepper", "Stimulating herbs", "Triphala"],
-    },
-  },
+// Blood test recommendations based on goals and health conditions - evidence-based
+const BLOOD_TEST_RECOMMENDATIONS: Record<string, string[]> = {
+  "weight-loss": [
+    "Complete Metabolic Panel (glucose, kidney, liver, electrolytes)",
+    "Lipid Panel (cholesterol, LDL, HDL, triglycerides)",
+    "Thyroid Function (TSH, Free T4)",
+    "Hemoglobin (anaemia screening)",
+  ],
+  "muscle-gain": [
+    "Complete Metabolic Panel",
+    "Iron Panel (ferritin, serum iron)",
+    "Vitamin B12 and folate",
+    "Testosterone (if male)",
+    "Vitamin D (25-hydroxyvitamin D)",
+  ],
+  "stress-management": [
+    "Complete Metabolic Panel",
+    "Thyroid Function (TSH, Free T4)",
+    "Vitamin D",
+    "Magnesium (blood serum)",
+  ],
+  "sleep-improvement": [
+    "Vitamin D (25-hydroxyvitamin D)",
+    "Thyroid Function (TSH, Free T4)",
+    "Iron Panel (ferritin, serum iron)",
+    "Magnesium (blood serum)",
+  ],
+  "low-energy": [
+    "Complete Metabolic Panel",
+    "Hemoglobin (CBC)",
+    "Vitamin D",
+    "Vitamin B12 and folate",
+    "Iron Panel",
+  ],
+  "general-wellness": [
+    "Complete Metabolic Panel",
+    "Lipid Panel",
+    "Thyroid Function (TSH, Free T4)",
+    "Vitamin D (25-hydroxyvitamin D)",
+    "Hemoglobin (CBC)",
+  ],
 };
 
-const BLOOD_TEST_RECOMMENDATIONS: Record<string, string[]> = {
-  "weight-loss": ["CBC", "HbA1c", "Lipid Panel", "TSH", "Vitamin D"],
-  "muscle-gain": ["Testosterone", "Ferritin", "B12", "Creatine Kinase", "Vitamin D"],
-  "stress-management": ["Cortisol (AM)", "DHEA", "TSH", "Vitamin D"],
-  "sleep-improvement": ["Vitamin D", "Magnesium", "Glucose", "TSH", "Iron Panel"],
-  "low-energy": ["CBC", "Vitamin D", "B12", "Iron Panel", "Thyroid Panel"],
-  "thyroid-symptoms": ["TSH", "FT3", "FT4", "anti-TPO"],
-  "pcos": ["LH", "FSH", "Testosterone", "Insulin (Fasting)", "Glucose"],
-  "hypertension": ["BP Monitoring", "Kidney Function", "Electrolytes"],
-  "diabetes-risk": ["Fasting Glucose", "HbA1c", "Insulin", "Lipid Panel"],
+// Evidence-based supplement recommendations - only proven interventions
+const EVIDENCE_BASED_SUPPLEMENTS = {
+  "stress-high": [
+    "Magnesium glycinate (300-400mg, reduces cortisol and improves sleep)",
+    "Omega-3 (EPA/DHA 2-3g, reduces inflammation and supports mood)",
+  ],
+  "stress-moderate": [
+    "Magnesium (200-300mg, daily for nervous system support)",
+  ],
+  "sleep-poor": [
+    "Magnesium glycinate (300-400mg before bed, improves sleep latency and depth)",
+    "L-Theanine (100-200mg, promotes relaxation without sedation)",
+  ],
+  "digestion-issues": [
+    "Probiotics (10-50 billion CFU, supports gut microbiota and digestion)",
+    "Digestive enzymes (with meals, if needed)",
+  ],
+  "energy-low": [
+    "Vitamin D3 (2000-4000 IU daily, critical for mood and energy)",
+    "Iron (if deficient per blood test, especially women)",
+    "Vitamin B12 (if deficient or plant-based diet)",
+  ],
+  "essential-all": [
+    "Vitamin D3 (2000-4000 IU daily, supports immunity, mood, bone health)",
+    "Omega-3 (EPA/DHA 2-3g daily, anti-inflammatory, cardiovascular and mental health)",
+    "Creatine monohydrate (3-5g daily, improves strength and cognition, proven safe)",
+  ],
 };
 
 export function analyzeQuizData(quizData: any, userName?: string, userEmail?: string): PersonalizationData {
+  // Extract core data
   const age = quizData.age || 30;
   const gender = quizData.gender || "female";
   const activityLevel = quizData.activityLevel || "moderately-active";
-  const bodyType = quizData.bodyType || "mesomorph";
   const stressLevel = quizData.stressLevel || "moderate";
   const sleepHours = quizData.sleepHours || "7-8";
   const energyLevels = quizData.energyLevels || "moderate";
+  const weightGoal = quizData.weightGoal || "maintain";
 
-  // Calculate stress score (0-100)
+  // Calculate health scores (1-100)
   const stressScoreMap = {
     "very-high": 85,
-    moderate: 60,
+    "high": 70,
+    moderate: 55,
     low: 30,
     minimal: 10,
   };
-  const stressScore = (stressScoreMap as any)[stressLevel] || 60;
+  const stressScore = (stressScoreMap as any)[stressLevel] || 55;
 
-  // Calculate sleep score (0-100)
   const sleepScoreMap = {
-    "less-than-5": 30,
-    "5-6": 50,
+    "less-than-5": 25,
+    "5-6": 45,
+    "6-7": 70,
     "7-8": 85,
     "more-than-8": 75,
   };
   const sleepScore = (sleepScoreMap as any)[sleepHours] || 85;
 
-  // Calculate activity score (0-100)
   const activityScoreMap = {
-    sedentary: 10,
+    sedentary: 15,
     "lightly-active": 40,
-    "moderately-active": 70,
+    "moderately-active": 65,
+    "very-active": 85,
     "highly-active": 95,
   };
-  const activityScore = (activityScoreMap as any)[activityLevel] || 70;
+  const activityScore = (activityScoreMap as any)[activityLevel] || 65;
 
-  // Calculate energy score (0-100)
   const energyScoreMap = {
-    "very-low": 10,
-    low: 30,
+    "very-low": 15,
+    low: 35,
     moderate: 60,
     high: 80,
     "very-high": 95,
   };
   const energyScore = (energyScoreMap as any)[energyLevels] || 60;
 
-  // Determine metabolism type
-  const metabolismType = determineMetabolismType(
-    age,
-    bodyType,
-    activityScore,
-    energyScore,
-    quizData.hungerFrequency
+  // Estimate body metrics using evidence-based anthropometry
+  // These are general estimates; actual values should come from user input if available
+  let estimatedHeightCm = gender === "female" ? 160 : 175;
+  let estimatedWeightKg = gender === "female" ? 65 : 80;
+
+  // Refine estimates based on activity level and energy (proxy for body composition)
+  if (activityScore > 80) {
+    // More active = potentially leaner
+    estimatedWeightKg *= 0.95;
+  } else if (activityScore < 30) {
+    // Less active = potentially heavier
+    estimatedWeightKg *= 1.05;
+  }
+
+  // Calculate BMR using Mifflin-St Jeor equation (most accurate for sedentary-to-active)
+  // BMR = (10 × weight_kg) + (6.25 × height_cm) - (5 × age) + (5 for males, -161 for females)
+  const bmrGenderFactor = gender === "male" ? 5 : -161;
+  const estimatedBMR = Math.round(
+    10 * estimatedWeightKg + 6.25 * estimatedHeightCm - 5 * age + bmrGenderFactor
   );
 
-  // Determine Ayurvedic type
-  const ayurvedicType = determineAyurvedicType(
-    bodyType,
-    stressScore,
-    quizData.bloatingFrequency,
-    quizData.cravings,
-    energyScore
-  );
-
-  // Estimate BMR using Mifflin-St Jeor (assume average weight/height based on age/gender/bodytype)
-  const estimatedBMR = estimateBMR(age, gender, bodyType);
+  // Calculate TDEE using activity multiplier (Harris-Benedict)
   const activityMultiplierMap = {
     sedentary: 1.2,
     "lightly-active": 1.375,
     "moderately-active": 1.55,
-    "highly-active": 1.725,
+    "very-active": 1.725,
+    "highly-active": 1.9,
   };
   const activityMultiplier = (activityMultiplierMap as any)[activityLevel] || 1.55;
   const estimatedTDEE = Math.round(estimatedBMR * activityMultiplier);
 
-  // Calculate macros based on goal and body type
+  // Calculate macronutrients based on goal (evidence-based ranges)
   const macros = calculateMacronutrients(
     estimatedTDEE,
-    quizData.weightGoal,
-    gender,
-    metabolismType,
-    bodyType
+    estimatedWeightKg,
+    weightGoal,
+    gender
   );
 
-  // Get medical conditions and create flags
+  // Extract health conditions
   const medicalConditions = Array.isArray(quizData.medicalConditions)
-    ? quizData.medicalConditions
-    : [quizData.medicalConditions || "none"];
-  const digestiveIssues = Array.isArray(quizData.digestiveIssues)
-    ? quizData.digestiveIssues
-    : [quizData.digestiveIssues || "none"];
-  const foodIntolerances = Array.isArray(quizData.foodIntolerances)
-    ? quizData.foodIntolerances
-    : [quizData.foodIntolerances || "none"];
-  const skinConcerns = Array.isArray(quizData.skinConcerns)
-    ? quizData.skinConcerns
-    : [quizData.skinConcerns || "none"];
+    ? quizData.medicalConditions.filter((c: string) => c !== "none")
+    : quizData.medicalConditions && quizData.medicalConditions !== "none"
+    ? [quizData.medicalConditions]
+    : [];
 
-  // Recommend blood tests based on conditions and goals
+  const digestiveIssues = Array.isArray(quizData.digestiveIssues)
+    ? quizData.digestiveIssues.filter((c: string) => c !== "none")
+    : quizData.digestiveIssues && quizData.digestiveIssues !== "none"
+    ? [quizData.digestiveIssues]
+    : [];
+
+  const foodIntolerances = Array.isArray(quizData.foodIntolerances)
+    ? quizData.foodIntolerances.filter((c: string) => c !== "none")
+    : quizData.foodIntolerances && quizData.foodIntolerances !== "none"
+    ? [quizData.foodIntolerances]
+    : [];
+
+  const skinConcerns = Array.isArray(quizData.skinConcerns)
+    ? quizData.skinConcerns.filter((c: string) => c !== "none")
+    : quizData.skinConcerns && quizData.skinConcerns !== "none"
+    ? [quizData.skinConcerns]
+    : [];
+
+  // Recommend blood tests based on goals and conditions
   const recommendedTests = getRecommendedBloodTests(
-    quizData.weightGoal,
+    weightGoal,
     medicalConditions,
     gender,
     age
   );
 
-  // Determine supplement priority
+  // Determine supplement priority (evidence-based only)
   const supplementPriority = getSupplementStack(
     gender,
     age,
-    medicalConditions,
     stressScore,
     sleepScore,
     digestiveIssues,
-    ayurvedicType
+    energyScore
   );
 
-  // Determine exercise intensity
+  // Exercise intensity based on activity level
   const exerciseIntensity =
-    activityLevel === "sedentary"
-      ? "low"
-      : activityLevel === "highly-active"
-      ? "high"
-      : "moderate";
+    activityScore > 80 ? "high" : activityScore > 45 ? "moderate" : "low";
 
-  // Meal frequency
-  const mealFrequency =
-    metabolismType === "fast" ? 4 : metabolismType === "slow" ? 2 : 3;
+  // Meal frequency recommendation (science-based)
+  // More frequent, smaller meals support stable energy and adherence for many
+  const mealFrequency = 3; // Evidence shows 3 meals optimal for most; adjust per person
 
   // Create profile
   const profile: UserProfile = {
@@ -263,18 +275,17 @@ export function analyzeQuizData(quizData: any, userName?: string, userEmail?: st
     email: userEmail || "user@example.com",
     age,
     gender,
-    bodyType,
-    metabolismType,
-    ayurvedicType,
-    stressScore,
-    sleepScore,
-    activityScore,
-    energyScore,
+    estimatedHeightCm,
+    estimatedWeightKg,
     estimatedBMR,
     estimatedTDEE,
     proteinGrams: macros.protein,
     carbsGrams: macros.carbs,
     fatsGrams: macros.fats,
+    stressScore,
+    sleepScore,
+    activityScore,
+    energyScore,
     medicalConditions,
     digestiveIssues,
     foodIntolerances,
@@ -282,160 +293,57 @@ export function analyzeQuizData(quizData: any, userName?: string, userEmail?: st
     dietaryPreference: quizData.dietaryPreference || "non-veg",
     exercisePreference: Array.isArray(quizData.exercisePreference)
       ? quizData.exercisePreference
-      : [quizData.exercisePreference || "walking"],
+      : quizData.exercisePreference
+      ? [quizData.exercisePreference]
+      : ["walking"],
     workSchedule: quizData.workSchedule || "9-to-5",
     region: "India",
-    dnaConsent: quizData.dnaUpload === "yes-upload",
     recommendedTests,
     supplementPriority,
     exerciseIntensity,
     mealFrequency,
+    dnaConsent: quizData.dnaUpload === "yes-upload",
   };
 
   // Generate insights
-  const insights = generateInsights(profile, quizData, ayurvedicType);
+  const insights = generateInsights(profile, quizData);
 
   return { profile, insights };
 }
 
-function determineMetabolismType(
-  age: number,
-  bodyType: string,
-  activityScore: number,
-  energyScore: number,
-  hungerFrequency: string
-): "fast" | "moderate" | "slow" {
-  let score = 0;
-
-  // Body type impact
-  if (bodyType === "ectomorph") score += 3;
-  else if (bodyType === "endomorph") score -= 3;
-
-  // Age impact
-  if (age < 25) score += 2;
-  else if (age > 45) score -= 2;
-
-  // Activity impact
-  score += (activityScore / 100) * 3;
-
-  // Energy impact
-  score += (energyScore / 100) * 2;
-
-  // Hunger impact
-  if (hungerFrequency === "1-2-hours") score += 2;
-  else if (hungerFrequency === "rarely") score -= 2;
-
-  if (score >= 4) return "fast";
-  if (score <= -4) return "slow";
-  return "moderate";
-}
-
-function determineAyurvedicType(
-  bodyType: string,
-  stressScore: number,
-  bloatingFrequency: string,
-  cravings: string,
-  energyScore: number
-): "vata" | "pitta" | "kapha" | "mixed" {
-  let vataScore = 0;
-  let pittaScore = 0;
-  let kaphaScore = 0;
-
-  // Body type
-  if (bodyType === "ectomorph") vataScore += 3;
-  else if (bodyType === "mesomorph") pittaScore += 3;
-  else if (bodyType === "endomorph") kaphaScore += 3;
-
-  // Stress
-  if (stressScore > 70) vataScore += 2;
-  else if (stressScore > 40) pittaScore += 1;
-  else kaphaScore += 1;
-
-  // Bloating
-  if (bloatingFrequency === "often") vataScore += 2;
-
-  // Cravings
-  if (cravings === "spicy-sour") pittaScore += 2;
-  else if (cravings === "sweet-foods") kaphaScore += 2;
-
-  // Energy
-  if (energyScore > 75) vataScore += 1;
-  else if (energyScore < 40) kaphaScore += 2;
-
-  const scores = { vata: vataScore, pitta: pittaScore, kapha: kaphaScore };
-  const maxDoshaScore = Math.max(...Object.values(scores));
-  const dominantDoshas = Object.entries(scores)
-    .filter(([_, score]) => score === maxDoshaScore)
-    .map(([dosha, _]) => dosha);
-
-  if (dominantDoshas.length > 1) return "mixed";
-  return (dominantDoshas[0] as any) || "mixed";
-}
-
-function estimateBMR(age: number, gender: string, bodyType: string): number {
-  // Estimate weight based on body type and gender
-  let estimatedWeight = 70; // Default 70kg
-
-  if (gender === "female") {
-    estimatedWeight = bodyType === "ectomorph" ? 55 : bodyType === "endomorph" ? 75 : 65;
-  } else {
-    estimatedWeight = bodyType === "ectomorph" ? 65 : bodyType === "endomorph" ? 90 : 75;
-  }
-
-  // Estimate height (cm)
-  let estimatedHeight = 170;
-  if (gender === "female") estimatedHeight = 160;
-
-  // Mifflin-St Jeor equation
-  const genderFactor = gender === "male" ? 5 : -161;
-  const bmr =
-    10 * estimatedWeight + 6.25 * estimatedHeight - 5 * age + genderFactor;
-
-  return Math.round(bmr);
-}
-
 function calculateMacronutrients(
   tdee: number,
+  weightKg: number,
   goal: string,
-  gender: string,
-  metabolismType: string,
-  bodyType: string
+  gender: string
 ): { protein: number; carbs: number; fats: number } {
-  let proteinGPerKg = 1.8; // Default 1.8g/kg
-  let carbPercentage = 0.45;
-  let fatPercentage = 0.25;
+  // Evidence-based macronutrient recommendations
+  // Protein: 1.6-2.2 g/kg depending on goal (conservatively 1.8-2.0 for most)
+  // Carbs & fats: Adjusted by goal
 
-  // Adjust based on goal
+  let proteinGPerKg = 1.8; // Default for maintenance
+  let carbPercentage = 0.45; // % of calories
+  let fatPercentage = 0.30; // % of calories
+
+  // Adjust by goal
   if (goal === "lose-weight") {
-    proteinGPerKg = 2.2; // Higher protein to preserve muscle
+    proteinGPerKg = 2.2; // Higher protein preserves muscle during deficit
     carbPercentage = 0.35;
-    fatPercentage = 0.25;
-  } else if (goal === "gain-weight") {
+    fatPercentage = 0.30;
+  } else if (goal === "gain-weight" || goal === "build-muscle") {
     proteinGPerKg = 1.8;
-    carbPercentage = 0.55;
-    fatPercentage = 0.2;
+    carbPercentage = 0.50;
+    fatPercentage = 0.25;
+  } else if (goal === "maintain") {
+    proteinGPerKg = 1.6;
+    carbPercentage = 0.45;
+    fatPercentage = 0.30;
   }
 
-  // Adjust based on metabolism
-  if (metabolismType === "fast") {
-    carbPercentage += 0.1;
-    fatPercentage -= 0.05;
-  } else if (metabolismType === "slow") {
-    carbPercentage -= 0.1;
-    fatPercentage += 0.05;
-  }
-
-  // Estimate weight (same as BMR estimation)
-  let estimatedWeight = gender === "female" ? 65 : 75;
-  if (bodyType === "ectomorph") estimatedWeight -= 10;
-  else if (bodyType === "endomorph") estimatedWeight += 10;
-
-  const proteinCalories = estimatedWeight * proteinGPerKg * 4;
-  const proteinGrams = Math.round(estimatedWeight * proteinGPerKg);
-  const carbCalories = tdee * carbPercentage;
-  const carbGrams = Math.round(carbCalories / 4);
-  const fatCalories = tdee * fatPercentage;
-  const fatGrams = Math.round(fatCalories / 9);
+  // Calculate actual grams
+  const proteinGrams = Math.round(weightKg * proteinGPerKg);
+  const carbGrams = Math.round((tdee * carbPercentage) / 4);
+  const fatGrams = Math.round((tdee * fatPercentage) / 9);
 
   return {
     protein: proteinGrams,
@@ -453,35 +361,27 @@ function getRecommendedBloodTests(
   const testsSet = new Set<string>();
 
   // Add tests based on goal
-  if (goal === "lose-weight") {
-    BLOOD_TEST_RECOMMENDATIONS["weight-loss"].forEach((t) => testsSet.add(t));
-  } else if (goal === "gain-weight") {
-    BLOOD_TEST_RECOMMENDATIONS["muscle-gain"].forEach((t) => testsSet.add(t));
-  }
+  const goalTests =
+    BLOOD_TEST_RECOMMENDATIONS[goal] ||
+    BLOOD_TEST_RECOMMENDATIONS["general-wellness"];
+  goalTests.forEach((t) => testsSet.add(t));
 
-  // Add tests based on conditions
-  conditions.forEach((condition) => {
-    const tests =
-      BLOOD_TEST_RECOMMENDATIONS[condition] ||
-      BLOOD_TEST_RECOMMENDATIONS[`${condition}-risk`];
-    if (tests) tests.forEach((t) => testsSet.add(t));
-  });
-
-  // Add age-based tests
+  // Add age-based tests (over 40, more comprehensive)
   if (age > 40) {
-    testsSet.add("Complete Metabolic Panel");
-    testsSet.add("Lipid Panel");
+    testsSet.add("Lipid Panel (cholesterol, LDL, HDL, triglycerides)");
+    testsSet.add("Thyroid Function (TSH, Free T4)");
   }
 
   // Add gender-specific tests
   if (gender === "female") {
-    testsSet.add("Iron Panel");
-    testsSet.add("Ferritin");
+    testsSet.add("Iron Panel (ferritin, serum iron, TIBC)");
+    testsSet.add("Hemoglobin (anaemia screening)");
   }
 
-  // Ensure basics
-  testsSet.add("Vitamin D");
-  testsSet.add("Thyroid Panel (TSH, Free T4)");
+  // Ensure core baseline tests
+  testsSet.add("Complete Metabolic Panel");
+  testsSet.add("Vitamin D (25-hydroxyvitamin D)");
+  testsSet.add("Thyroid Function (TSH, Free T4)");
 
   return Array.from(testsSet);
 }
@@ -489,94 +389,70 @@ function getRecommendedBloodTests(
 function getSupplementStack(
   gender: string,
   age: number,
-  conditions: string[],
   stressScore: number,
   sleepScore: number,
   digestiveIssues: string[],
-  ayurvedicType: string
+  energyScore: number
 ): string[] {
   const stack: string[] = [];
 
-  // Essential for all
-  stack.push("Vitamin D3 (1000-2000 IU)");
-  stack.push("Omega-3 (1000-2000mg EPA/DHA)");
+  // Essential for all (proven, safe, evidence-based)
+  stack.push("Vitamin D3 (2000-4000 IU daily - supports immunity, mood, bone health)");
+  stack.push("Omega-3 (EPA+DHA 2-3g daily - anti-inflammatory, cardiovascular and mental health)");
 
-  // Age-based
-  if (age > 40) {
-    stack.push("Multivitamin");
-  }
-
-  // Gender-specific
-  if (gender === "female") {
-    stack.push("Iron (if deficient)");
-  }
-
-  // Stress support
+  // Stress management (neuroscience-based)
   if (stressScore > 70) {
-    stack.push("Magnesium (300-400mg)");
-    stack.push("Ashwagandha (300-500mg)");
+    stack.push("Magnesium glycinate (300-400mg daily - reduces cortisol, improves sleep)");
   } else if (stressScore > 50) {
-    stack.push("Magnesium (200-300mg)");
+    stack.push("Magnesium (200-300mg daily - nervous system support)");
   }
 
-  // Sleep support
-  if (sleepScore < 60) {
-    stack.push("Magnesium Glycinate");
-    stack.push("L-Theanine (100-200mg)");
+  // Sleep support (if needed)
+  if (sleepScore < 65) {
+    stack.push("Magnesium glycinate (300-400mg before bed)");
+    stack.push("L-Theanine (100-200mg - promotes relaxation)");
   }
 
-  // Digestive support
-  if (digestiveIssues.includes("gas") || digestiveIssues.includes("acidity")) {
-    stack.push("Probiotics (10-50 billion CFU)");
+  // Digestive support (microbiome science)
+  if (digestiveIssues.length > 0) {
+    stack.push("Probiotics (10-50 billion CFU - supports gut microbiota)");
   }
 
-  // Ayurvedic support
-  if (ayurvedicType === "vata") {
-    stack.push("Ashwagandha");
-  } else if (ayurvedicType === "pitta") {
-    stack.push("Brahmi");
-  } else if (ayurvedicType === "kapha") {
-    stack.push("Ginger + Black Pepper");
+  // Energy support
+  if (energyScore < 50) {
+    stack.push("Vitamin B12 (if deficient per blood test, especially plant-based diet)");
   }
 
-  return stack.slice(0, 7); // Return top 7 supplements
+  // Gender/age specific
+  if (gender === "female" && age > 35) {
+    stack.push("Iron supplementation (if deficient per blood test)");
+  }
+
+  // Limit to top evidence-backed supplements
+  return stack.slice(0, 8);
 }
 
 function generateInsights(
   profile: UserProfile,
-  quizData: any,
-  ayurvedicType: string
+  quizData: any
 ): PersonalizationData["insights"] {
-  const ayurvedicInfo = (AYURVEDIC_CHARACTERISTICS as any)[ayurvedicType] || {
-    traits: [],
-    recommendations: {},
-  };
-
-  // Meal times based on wake time
+  // Determine meal timing based on wake time (circadian science)
   const wakeTime = quizData.wakeUpTime || "6-8";
-  const mealTimes =
-    wakeTime === "before-6"
-      ? ["6:30-7:30 AM", "12:30-1:30 PM", "7:00-8:00 PM"]
-      : wakeTime === "after-10"
-      ? ["11:00 AM-12:00 PM", "3:00-4:00 PM", "9:00-10:00 PM"]
-      : ["8:00-9:00 AM", "1:00-2:00 PM", "7:30-8:30 PM"];
+  let recommendedMealTimes: string[] = [];
+
+  if (wakeTime === "before-6") {
+    recommendedMealTimes = ["6:30-7:30 AM", "12:30-1:30 PM", "7:00-8:00 PM"];
+  } else if (wakeTime === "after-10") {
+    recommendedMealTimes = ["11:00 AM-12:00 PM", "3:00-4:00 PM", "9:00-10:00 PM"];
+  } else {
+    // Default 6-8 or 8-10 AM wake times
+    recommendedMealTimes = ["8:00-9:00 AM", "1:00-2:00 PM", "7:30-8:30 PM"];
+  }
 
   return {
-    metabolicInsight: `Your ${profile.metabolismType} metabolism indicates ${
-      profile.metabolismType === "fast"
-        ? "you burn calories quickly and benefit from frequent meals"
-        : profile.metabolismType === "slow"
-        ? "you burn calories slowly and benefit from portion control and thermogenic foods"
-        : "you have a balanced metabolism that responds well to consistent meal timing"
-    }. Estimated daily calorie needs: ${profile.estimatedTDEE} calories.`,
+    metabolicInsight: `Based on exercise physiology research, your estimated resting metabolic rate (BMR) is ${profile.estimatedBMR} calories/day. With your ${profile.activityLevel} activity level, your daily energy expenditure (TDEE) is approximately ${profile.estimatedTDEE} calories. This means eating at or around ${profile.estimatedTDEE} calories maintains your current weight; eat below this for fat loss, above for muscle gain.`,
 
-    ayurvedicInsight: `Your Ayurvedic constitution is ${ayurvedicType.toUpperCase()}. ${
-      ayurvedicInfo.recommendations.meals || "Follow balanced meal timing"
-    }. Focus on: ${ayurvedicInfo.recommendations.foods?.join(", ") || "nourishing foods"}. Avoid: ${
-      ayurvedicInfo.recommendations.avoid?.join(", ") || "incompatible foods"
-    }.`,
-
-    recommendedMealTimes: mealTimes,
+    recommendedMealTimes,
 
     calorieRange: {
       min: Math.round(profile.estimatedTDEE * 0.85),
@@ -584,52 +460,55 @@ function generateInsights(
     },
 
     macroRatios: {
-      protein: Math.round((profile.proteinGrams / profile.estimatedTDEE) * 100 * 4),
-      carbs: Math.round((profile.carbsGrams / profile.estimatedTDEE) * 100 * 4),
-      fats: Math.round((profile.fatsGrams / profile.estimatedTDEE) * 100 * 9),
+      protein: Math.round((profile.proteinGrams * 4) / profile.estimatedTDEE * 100),
+      carbs: Math.round((profile.carbsGrams * 4) / profile.estimatedTDEE * 100),
+      fats: Math.round((profile.fatsGrams * 9) / profile.estimatedTDEE * 100),
     },
 
-    supplementStack: profile.supplementPriority.map((supp) => ({
-      name: supp,
-      reason: `Supports your ${ayurvedicType} type and current wellness needs`,
-    })),
+    supplementStack: profile.supplementPriority.map((supp) => {
+      const [name, description] = supp.includes(" (") 
+        ? [supp.substring(0, supp.indexOf(" (")), supp.substring(supp.indexOf("(") + 1, supp.length - 1)]
+        : [supp, "Evidence-based health support"];
+      return {
+        name,
+        reason: description || "Supports optimal health and wellness",
+      };
+    }),
 
-    workoutStrategy: `${profile.exerciseIntensity.charAt(0).toUpperCase() + profile.exerciseIntensity.slice(1)} intensity training, ${
+    workoutStrategy: `${profile.exerciseIntensity.charAt(0).toUpperCase() + profile.exerciseIntensity.slice(1)} intensity exercise physiology indicates ${
       profile.exerciseIntensity === "low"
-        ? "3 days per week"
+        ? "3 days/week of moderate activity (walking, yoga, light strength training) supports health without overload"
         : profile.exerciseIntensity === "moderate"
-        ? "4-5 days per week"
-        : "5-6 days per week"
-    } is optimal for your profile.`,
+        ? "4-5 days/week combining resistance and cardio builds strength and aerobic capacity"
+        : "5-6 days/week with periodized training (varying volume and intensity) maximizes performance adaptations"
+    }.`,
 
-    sleepStrategy: `Your sleep score is ${profile.sleepScore}/100. ${
+    sleepStrategy: `Sleep neurobiology research shows that your current sleep score of ${profile.sleepScore}/100 indicates ${
       profile.sleepScore < 50
-        ? "Prioritize sleep improvement with consistent bedtime, dark room, and sleep support supplements."
+        ? "significant sleep disruption. Prioritize consistent sleep-wake timing (even on weekends), a cool (65-68°F), dark, quiet bedroom, and consider magnesium glycinate (300-400mg 60 min before bed) after 2 weeks of protocol consistency."
         : profile.sleepScore < 75
-        ? "Maintain good sleep hygiene and consider sleep support supplements."
-        : "Your sleep is good; maintain current schedule."
+        ? "room for improvement. Maintain consistent sleep-wake timing, ensure your bedroom is dark (<5 lux), quiet (<30 dB), and cool (65-68°F). A structured evening routine starting 60 min before bed (no screens, warm bath/tea) supports sleep quality."
+        : "good sleep quality. Continue your current sleep schedule and environment—consistency is key. 7-9 hours nightly supports all other health interventions."
     }`,
 
-    stressStrategy: `Your stress score is ${profile.stressScore}/100. ${
+    stressStrategy: `Stress neuroscience shows elevated cortisol impairs sleep, immunity, and body composition. Your stress score of ${profile.stressScore}/100 suggests ${
       profile.stressScore > 70
-        ? "Daily meditation, breathing exercises, and stress-support supplements recommended."
+        ? "high chronic stress activation. Daily evidence-based tools: Box breathing (4-4-4-4, 5 rounds) activates parasympathetic tone in 5 min. 20-30 min moderate-intensity movement (walking, cycling) reduces cortisol comparable to anti-anxiety medication. Magnesium glycinate (300-400mg) and omega-3 (2-3g EPA/DHA) support nervous system regulation."
         : profile.stressScore > 50
-        ? "Incorporate 15-20 minutes daily stress-reduction practice."
-        : "Maintain your low-stress lifestyle with regular self-care."
+        ? "moderate stress. Incorporate 15-20 min daily of stress-reduction: walking, meditation, or breathing exercises. Consistent sleep and movement are powerful stress buffers."
+        : "low stress levels. Maintain current healthy practices—consistent sleep, regular movement, and social connection are proven stress resilience factors."
     }`,
   };
 }
 
 export function getBMRInsight(profile: UserProfile): string {
-  return `Your estimated Basal Metabolic Rate (BMR) is ${profile.estimatedBMR} calories, meaning you burn approximately ${profile.estimatedBMR} calories at complete rest. With your ${profile.activityScore}/100 activity level, your Total Daily Energy Expenditure (TDEE) is approximately ${profile.estimatedTDEE} calories.`;
+  return `Your estimated Basal Metabolic Rate (BMR) is ${profile.estimatedBMR} calories/day, calculated using the evidence-based Mifflin-St Jeor equation. This represents the calories you burn at complete rest. Combined with your activity level, your Total Daily Energy Expenditure (TDEE) is approximately ${profile.estimatedTDEE} calories/day—this is your maintenance calorie target.`;
 }
 
 export function getMacroBreakdown(profile: UserProfile): string {
-  return `Based on your profile, daily macro targets: Protein ${profile.proteinGrams}g (${Math.round(
-    (profile.proteinGrams * 4) / profile.estimatedTDEE * 100
-  )}%), Carbs ${profile.carbsGrams}g (${Math.round(
-    (profile.carbsGrams * 4) / profile.estimatedTDEE * 100
-  )}%), Fats ${profile.fatsGrams}g (${Math.round(
-    (profile.fatsGrams * 9) / profile.estimatedTDEE * 100
-  )}%).`;
+  const proteinPercent = Math.round((profile.proteinGrams * 4) / profile.estimatedTDEE * 100);
+  const carbPercent = Math.round((profile.carbsGrams * 4) / profile.estimatedTDEE * 100);
+  const fatPercent = Math.round((profile.fatsGrams * 9) / profile.estimatedTDEE * 100);
+
+  return `Based on exercise science research, your daily macronutrient targets are: Protein ${profile.proteinGrams}g (${proteinPercent}%) - preserves muscle and supports satiety; Carbohydrates ${profile.carbsGrams}g (${carbPercent}%) - fuels performance and recovery; Healthy Fats ${profile.fatsGrams}g (${fatPercent}%) - supports hormones and nutrient absorption.`;
 }
