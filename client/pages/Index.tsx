@@ -247,7 +247,7 @@ export default function Index() {
                 <ul className="space-y-3 text-gray-600">
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span>Body type & metabolism analysis</span>
+                    <span>Metabolic profiling & energy analysis</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-5 w-5 text-green-500" />
@@ -282,7 +282,7 @@ export default function Index() {
                 <ul className="space-y-3 text-gray-600">
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-5 w-5 text-pink-500" />
-                    <span>Ayurveda + Modern Science</span>
+                    <span>Evidence-Based Science</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-5 w-5 text-pink-500" />
