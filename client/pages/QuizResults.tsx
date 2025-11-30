@@ -41,7 +41,7 @@ const planFeatures = {
     price: 0,
     features: [
       "Complete lifestyle questionnaire analysis",
-      "Basic body type classification",
+      "Metabolic baseline assessment",
       "Simple meal timing recommendations",
       "General fitness guidance",
       "Sleep hygiene tips",
