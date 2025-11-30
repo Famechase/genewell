@@ -45,7 +45,6 @@ export const WellnessQuizSchema = z.object({
     "moderately-active",
     "highly-active",
   ]),
-  bodyType: z.enum(["ectomorph", "mesomorph", "endomorph", "not-sure"]),
   cravings: z.enum([
     "sweet-foods",
     "salty-snacks",
