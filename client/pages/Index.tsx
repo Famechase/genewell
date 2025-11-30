@@ -543,8 +543,7 @@ export default function Index() {
               Behind Your Plan
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Our AI combines ancient Ayurvedic wisdom with cutting-edge
-              nutritional genomics
+              Our AI combines evidence-based exercise science, nutrition research, sleep neurobiology, behavioral psychology, and optional DNA insights
             </p>
           </div>
 
