@@ -647,9 +647,9 @@ function createBlueprintFromPersonalization(data: PersonalizationData): Wellness
 
     personalizedTips: [
       insights.metabolicInsight,
-      insights.ayurvedicInsight,
       insights.workoutStrategy,
       insights.sleepStrategy,
+      insights.stressStrategy,
     ],
 
     progressTracking: {
