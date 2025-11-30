@@ -663,13 +663,6 @@ function createBlueprintFromPersonalization(data: PersonalizationData): Wellness
       redFlags: ["Persistent fatigue", "Increased stress", "Sleep issues"],
     },
 
-    ayurvedicInsights: {
-      constitution: profile.ayurvedicType,
-      imbalances: ["Based on profile"],
-      recommendations: [insights.ayurvedicInsight],
-      seasonalTips: ["Adjust to season"],
-    },
-
     confidenceScore: Math.min(95, 70 + Object.keys(profile).length),
     generatedAt: new Date().toISOString(),
     validUntil: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
