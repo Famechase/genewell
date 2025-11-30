@@ -206,40 +206,6 @@ const quizQuestions = [
     ],
   },
   {
-    id: "bodyType",
-    title: "Which body type best describes you?",
-    subtitle:
-      "Body composition affects optimal nutrition and exercise approach",
-    icon: User,
-    type: "select" as const,
-    options: [
-      {
-        value: "ectomorph",
-        label: "Lean, hard to gain weight",
-        emoji: "🥖",
-        description: "Naturally thin, fast metabolism",
-      },
-      {
-        value: "mesomorph",
-        label: "Athletic, muscular build",
-        emoji: "💪",
-        description: "Naturally muscular, balanced metabolism",
-      },
-      {
-        value: "endomorph",
-        label: "Curvy, gains weight easily",
-        emoji: "🍎",
-        description: "Fuller figure, slower metabolism",
-      },
-      {
-        value: "not-sure",
-        label: "Not sure / Mixed",
-        emoji: "🤔",
-        description: "Combination or unclear",
-      },
-    ],
-  },
-  {
     id: "cravings",
     title: "What do you crave most often?",
     subtitle: "Cravings reveal nutrient deficiencies and metabolic imbalances",
@@ -330,7 +296,7 @@ const quizQuestions = [
       { value: "daily", label: "Daily", emoji: "🛵" },
       { value: "3-5-times", label: "3-5 times a week", emoji: "📦" },
       { value: "1-2-times", label: "1-2 times a week", emoji: "🍕" },
-      { value: "rarely", label: "Rarely/Never", emoji: "👩‍🍳" },
+      { value: "rarely", label: "Rarely/Never", emoji: "👩‍����" },
     ],
   },
   {
