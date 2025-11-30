@@ -234,7 +234,7 @@ export const WellnessBlueprintSchema = z.object({
     imbalances: z.array(z.string()),
     recommendations: z.array(z.string()),
     seasonalTips: z.array(z.string()),
-  }),
+  }).optional(),
 
   confidenceScore: z.number().min(0).max(100),
   generatedAt: z.string(),
