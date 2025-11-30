@@ -482,12 +482,12 @@ function createBlueprintFromPersonalization(data: PersonalizationData): Wellness
 
   return {
     metabolismType: {
-      type: profile.metabolismType,
+      type: "moderate",
       description: insights.metabolicInsight,
       characteristics: [
-        `${profile.metabolismType.charAt(0).toUpperCase() + profile.metabolismType.slice(1)} metabolism`,
         `BMR: ${profile.estimatedBMR} calories`,
         `TDEE: ${profile.estimatedTDEE} calories`,
+        `Daily calorie range: ${insights.calorieRange.min} - ${insights.calorieRange.max}`,
       ],
     },
 
