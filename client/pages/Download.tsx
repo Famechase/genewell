@@ -79,12 +79,15 @@ export default function Download() {
         throw new Error("Analysis ID not found. Please complete the quiz first.");
       }
 
+      // Convert plan ID to tier name (remove "_blueprint" suffix)
+      const planTier = config.planId.replace("_blueprint", "");
+
       const response = await fetch("/api/wellness/purchase", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           analysisId,
-          planTier: config.planId,
+          planTier,
           addOns: config.selectedAddOns,
         }),
       });
