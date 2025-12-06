@@ -75,11 +75,19 @@ export default function Pricing() {
 
   const handleSelectPlan = (planId: string) => {
     const quizCompleted = localStorage.getItem("analysisId");
-    
-    if (!quizCompleted && planId !== "free-blueprint") {
+    const plan = plans.find((p) => p.id === planId);
+
+    // For free plan, skip quiz and go directly to add-ons
+    if (planId === "free-blueprint") {
+      setSelectedPlanId(planId);
+      setSelectedAddOns([]);
+      setShowAddOns(true);
+    } else if (!quizCompleted) {
+      // For paid plans without completed quiz, open quiz modal
       setSelectedPlanId(planId);
       setQuizGateOpen(true);
     } else {
+      // Quiz completed, show add-ons selection
       setSelectedPlanId(planId);
       setSelectedAddOns([]);
       setShowAddOns(true);
