@@ -31,9 +31,9 @@ function generateAnalysisId(): string {
 function getTierPrice(tier: string): number {
   const priceMap: Record<string, number> = {
     free: 0,
-    essential: 999,
-    premium: 1999,
-    coaching: 4999,
+    essential: 599,
+    premium: 1499,
+    coaching: 9999,
   };
   return priceMap[tier] || 0;
 }
