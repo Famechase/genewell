@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,7 +26,6 @@ import {
   PlanConfiguration,
 } from "@/lib/products";
 import LegalFooter from "@/components/LegalFooter";
-import { useState } from "react";
 
 export default function Checkout() {
   const navigate = useNavigate();
