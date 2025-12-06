@@ -129,10 +129,6 @@ const recommendPlan = (
 export default function QuizResults() {
   const navigate = useNavigate();
   const [quizData, setQuizData] = useState<any>(null);
-  const [selectedPlan, setSelectedPlan] = useState<string>("");
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [analysisId, setAnalysisId] = useState<string>("");
   const [blueprint, setBlueprint] = useState<any>(null);
@@ -152,11 +148,6 @@ export default function QuizResults() {
     setQuizData(parsedQuiz);
     setAnalysisId(savedAnalysisId);
     setBlueprint(parsedBlueprint);
-
-    const initialPlan = recommendPlan(parsedQuiz, parsedBlueprint);
-    setSelectedPlan(initialPlan);
-    setEmail(parsedQuiz.userEmail || "");
-    setName(parsedQuiz.userName || "");
     setAnalysisComplete(true);
   }, [navigate]);
 
