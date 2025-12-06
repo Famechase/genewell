@@ -125,8 +125,11 @@ export default function Pricing() {
   const handleContinueCheckout = () => {
     if (!selectedPlanId) return;
 
+    const plan = plans.find((p) => p.id === selectedPlanId);
+    if (!plan || !plan.planId) return;
+
     const configuration: PlanConfiguration = {
-      planId: selectedPlanId,
+      planId: plan.planId, // Use the planId with underscores (e.g., "free_blueprint")
       selectedAddOns,
       totalPrice: calculateTotal(),
     };
