@@ -1,5 +1,23 @@
+// Plan ID Mapping (from specification)
+export const PLAN_IDS = {
+  FREE: "free_blueprint",
+  ESSENTIAL: "essential_blueprint",
+  PREMIUM: "premium_blueprint",
+  COACHING: "coaching_blueprint",
+} as const;
+
+export const ADDON_IDS = {
+  DNA: "addon_dna",
+  SUPPLEMENT: "addon_supplement",
+  ATHLETE: "addon_athlete",
+  FAMILY: "addon_family",
+  WOMEN_HORMONE: "addon_women_hormone",
+  MEN_FITNESS: "addon_men_fitness",
+} as const;
+
 export interface Product {
   id: string;
+  planId?: string;
   name: string;
   description: string;
   details: string[];
@@ -7,6 +25,7 @@ export interface Product {
   color: string;
   icon: string;
   link: string;
+  pageCount: number; // NEW: Approximate page count for PDF
   pdfContent?: string;
 }
 
@@ -17,565 +36,330 @@ export interface AddOn {
   price: number;
   icon: string;
   features: string[];
+  pageCountAddition: number; // NEW: Additional pages this add-on adds to PDF
+}
+
+export interface PlanConfiguration {
+  planId: string;
+  selectedAddOns: string[];
+  totalPrice: number;
+  userName?: string;
+  userEmail?: string;
 }
 
 // FREE BLUEPRINT - Basic wellness foundation
 export const FREE_BLUEPRINT: Product = {
   id: "free-blueprint",
+  planId: PLAN_IDS.FREE,
   name: "Free Blueprint",
-  description: "Science-based wellness foundation",
+  description: "Sleep & circadian rhythm assessment. Stress and energy evaluation. 5 daily habit recommendations. Hydration & movement guidelines. 90-day quick-start checklist. Approx. 6-page PDF, personalized for your profile.",
   details: [
     "Sleep & circadian rhythm assessment",
     "Stress and energy evaluation",
     "5 daily habit recommendations",
     "Hydration & movement guidelines",
-    "30-day quick-start checklist",
+    "90-day quick-start checklist",
   ],
   price: 0,
   color: "gray",
   icon: "gift",
   link: "/view-sample-report",
-  pdfContent: `# FREE BLUEPRINT
-Your Personal Wellness Foundation
-Generated: ${new Date().toLocaleDateString()}
+  pageCount: 6,
+  pdfContent: `# YOUR WELLNESS BLUEPRINT – FREE EDITION
+Personalized for {{userName}}
+Generated: {{generatedDate}}
 
-## START HERE
+## COVER PAGE
 
-This free guide gives you science-backed basics to improve your energy, sleep, and stress without guesswork. No diet hype. No workout gimmicks. Just what research shows actually works.
-
-## WHAT WE'RE ASSESSING
-
-Based on your answers, we've gathered data on:
-- Your current sleep patterns and circadian timing
-- Baseline energy and stress levels  
-- Daily movement and activity habits
-- Hydration and nutrition timing
-- Recovery and rest capacity
-
-## YOUR ENERGY & SLEEP PROFILE
-
-Research from sleep neurobiology shows that circadian timing—when you wake, eat, and rest—directly drives energy production (Dijk & Archer, 2010, PNAS). Your answers show your natural patterns. We're not changing them; we're optimizing what you already do.
-
-Your current rhythm:
-- Natural wake time and sleep pressure build
-- Peak energy windows throughout the day
-- Stress patterns tied to your schedule
-- Recovery gaps and rest quality
-
-## 5 CHANGES THAT WORK (Backed by Research)
-
-### 1. Fixed Sleep-Wake Timing (Consistency > Duration)
-Clinical sleep research shows sleeping 7 hours at irregular times harms you more than sleeping 6 hours consistently (Walker, 2017). Pick a wake time. Stick to it—even weekends.
-→ Your baseline: Set one wake time for 30 days.
-
-### 2. Morning Light Exposure (30 Minutes, No Glasses)
-Light hitting your eyes 30 minutes after waking sets your circadian clock forward, making evening sleep come earlier (Chang et al., 2015, PNAS). No special light box needed. Real sunlight works.
-→ Your action: Step outside for 20-30 minutes after waking.
-
-### 3. Meal Timing Windows (Eating Inside a 10–12 Hour Window)
-Eating across a compressed window (e.g., 8am–6pm) aligns with your circadian system. Eating 16+ hours per day disrupts insulin sensitivity and sleep quality (Chaix et al., 2014, Cell Metabolism).
-→ Your action: Identify your natural eating window and stay consistent.
-
-### 4. Movement Before Afternoon (Any Intensity)
-Physical activity in the morning and early afternoon strengthens circadian signals and reduces evening cortisol (Thorp et al., 2015, Diabetes Care). Gym-level intensity isn't required.
-→ Your action: 20-minute walk, yoga, or light strength work—morning or midday.
-
-### 5. No Screens 1 Hour Before Sleep
-Blue light suppresses melatonin by 85% (Chang et al., 2015). Reading, conversation, or a warm shower trigger melatonin release instead.
-→ Your action: Stop screens at your target bedtime minus 60 minutes.
-
-## HYDRATION BASICS
-
-Chronic mild dehydration impairs cognition and mood (Popkin et al., 2010, Nutrition Reviews). Simple protocol:
-- Upon waking: 500ml water
-- With each meal: 250ml water
-- Between meals: Drink if thirsty
-
-That's it. No "gallon per day" nonsense—context matters (climate, activity, diet).
-
-## STRESS ASSESSMENT
-
-Your stress score reflects how your nervous system is currently regulated. Chronic elevation suppresses immune function and disrupts sleep architecture (Slavich & Irwin, 2014). Three evidence-backed tools:
-
-**Box Breathing** (Laborde et al., 2016)
-- Inhale 4 counts, hold 4, exhale 4, hold 4.
-- Do 5 rounds when stress spikes.
-- Activates parasympathetic nervous system in minutes.
-
-**Movement as stress relief** (Schuch et al., 2016)
-- 20-30 minutes of moderate activity reduces cortisol comparable to anti-anxiety medication.
-- Walking counts. Intensity doesn't define benefit.
-
-**Sleep debt compounds stress** (Walker, 2017)
-- One night of poor sleep increases amygdala (fear center) reactivity by 60%.
-- Fix sleep first. Stress tools work better when rested.
-
-## YOUR 30-DAY START
-
-Week 1: Fix sleep timing
-- Set one wake time. Commit to it.
-- Get morning light.
-
-Week 2: Add meal consistency
-- Define your 10–12 hour eating window.
-- Eat breakfast within 2 hours of waking.
-
-Week 3: Add movement
-- 20-minute walk or light workout, morning or midday, 3x this week.
-- Journal energy levels before and after.
-
-Week 4: Assess & reset
-- How's your energy? Sleep quality improved?
-- Which changes stuck? Which didn't?
-- Plan next steps: Free Blueprint has given you a foundation. Premium adds structure.
-
-## SCIENCE CITED
-
-Dijk, D. J., & Archer, S. N. (2010). PERIOD3, Circadian Phenotypes, and Sleep Homeostasis. Sleep Health, 33(Suppl 1), S7–S13.
-
-Walker, M. (2017). Why We Sleep. Scribner.
-
-Chaix, A., et al. (2014). Time-Restricted Feeding Is a Preventative and Therapeutic Intervention Against Diverse Nutritional Challenges. Cell Metabolism, 20(6), 991–1005.
-
-Chang, A. M., et al. (2015). Evening Use of Light-Emitting eReaders Negatively Affects Sleep, Circadian Timing, and Next-Morning Alertness. PNAS, 112(4), 1232–1237.
-
-Popkin, B. M., et al. (2010). Water, Hydration, and Health. Nutrition Reviews, 68(8), 439–458.
-
-Schuch, F. B., et al. (2016). Exercise as a Treatment for Depression: A Meta-Analysis Adjusting for Publication Bias. Journal of Psychiatric Research, 77, 42–51.
-
-Slavich, G. M., & Irwin, M. R. (2014). From Stress to Inflammation and Major Depressive Disorder: A Social Signal Transduction Theory of Depression. Psychological Bulletin, 140(3), 774–815.
+Your Wellness Blueprint – Free Edition
+Personalized for {{userName}}
+Plan Tier: Free Blueprint
+Date of Generation: {{generatedDate}}
 
 ---
 
-Next Step: Ready to go deeper? Upgrade to Essential Blueprint for personalized meal timing, movement plans, and sleep optimization specific to your schedule.
+## PAGE 2: EXECUTIVE SUMMARY
+
+### Your Wellness Profile at a Glance
+
+**Key Numbers:**
+- Age: {{age}} years
+- Activity Level: {{activityLevel}}
+- Current Sleep: {{sleepHours}} hours/night
+- Stress Level: {{stressLevel}}/5
+- Primary Goal: {{weightGoal}}
+
+**Top 5 Actions This Week:**
+1. Set one consistent wake time (including weekends)
+2. Get 20–30 minutes of morning sunlight within 1 hour of waking
+3. Identify your natural 10–12 hour eating window and stay consistent
+4. Do 20 minutes of movement (walk, yoga, strength) in morning or midday, 3x this week
+5. Stop screens 1 hour before your target bedtime
+
+**Simple Wellness Scores:**
+- Sleep Consistency: [Visual bar chart: 1-5 scale]
+- Energy Stability: [Visual bar chart: 1-5 scale]
+- Stress Resilience: [Visual bar chart: 1-5 scale]
+- Activity Consistency: [Visual bar chart: 1-5 scale]
+
+---
+
+## PAGE 3: LIFESTYLE AND METABOLIC OVERVIEW
+
+### Your Metabolic Baseline
+
+Your body burns a baseline amount of energy at complete rest, called Basal Metabolic Rate (BMR). Research shows it depends on age, sex, height, weight, and activity.
+
+**Estimated Basal Metabolic Rate (BMR):** {{estimatedBMR}} calories/day
+This is what you burn if you were completely at rest.
+
+**Total Daily Energy Expenditure (TDEE):** {{estimatedTDEE}} calories/day
+This is what you burn given your current {{activityLevel}} activity level.
+
+**What This Means:**
+- If you eat {{estimatedTDEE}} calories daily, your weight stays stable
+- If you eat 300–500 calories less, you lose ~0.5 lb per week (fat loss research: Helms et al., 2014)
+- If you eat 300–500 calories more, you gain ~0.5 lb per week (muscle gain requires surplus: Schoenfeld et al., 2016)
+
+### Your Sleep Profile
+
+Sleep is the foundation. Research from sleep neurobiology shows that **consistency matters more than duration** (Walker, 2017). Sleeping 6 hours at the same time every night harms you less than sleeping 8 hours at irregular times.
+
+**Your Current Pattern:**
+- Natural wake time: {{wakeUpTime}}
+- Current sleep hours: {{sleepHours}}
+- Energy dip times: {{tiredTime}}
+- Sleep quality: {{sleepQuality}}/5
+
+**Key Finding:** Your circadian rhythm is set by when you wake, not when you sleep. Fixing wake time first produces the fastest sleep improvements.
+
+### Your Movement & Stress
+
+**Activity Level:** {{activityLevel}}
+- This affects your calorie needs and recovery capacity
+- Research shows 20–30 minutes of any moderate movement (walk, yoga, strength) reduces cortisol and anxiety comparable to medication (Schuch et al., 2016)
+
+**Stress Level:** {{stressLevel}}/5
+- Chronic stress elevation suppresses immunity and disrupts sleep architecture (Slavich & Irwin, 2014)
+- Stress is normal; the question is how quickly you recover
+
+---
+
+## PAGE 4: SLEEP & STRESS OPTIMIZATION (BASIC)
+
+### Sleep Protocol
+
+**Week 1: Lock In Wake Time**
+1. Choose your target wake time (e.g., 6:30 AM)
+2. Set an alarm. Wake at this time every day—including weekends—for 30 days
+3. Sleep duration will adjust. Don't force it.
+
+**Evidence:** Consistent wake time re-synchronizes your circadian clock faster than any other single intervention (Chang et al., 2015).
+
+### Get Morning Light (30 Minutes, No Glasses)
+
+Light hitting your eyes 30 minutes after waking sets your circadian clock forward, making evening sleep come earlier.
+
+**Action:**
+- Step outside for 20–30 minutes within 1 hour of waking
+- No sunglasses. Real sunlight works. On cloudy days, stay longer
+- This is free, evidence-backed, and works (Chang et al., 2015, PNAS)
+
+### Meal Timing Windows (Eating Inside 10–12 Hours)
+
+Eating across a compressed window (e.g., 8am–6pm) aligns your circadian system. Eating 16+ hours per day disrupts insulin sensitivity and sleep quality.
+
+**Action:**
+- Identify when you naturally first feel hungry: That's breakfast time
+- Count back 10–12 hours: That's your eating window close time
+- Eat within this window consistently
+
+Example: If breakfast is 7 AM, eating stops by 5–7 PM.
+
+### Hydration Basics
+
+Chronic mild dehydration impairs cognition and mood (Popkin et al., 2010).
+
+**Simple Protocol:**
+- Upon waking: 500ml water
+- With each meal: 250ml water
+- Between meals: Drink if thirsty
+- 3 hours before sleep: Reduce intake (minimize nighttime urination)
+
+That's it. No "gallon per day" rule—context matters (climate, activity, diet).
+
+### Stress Assessment & Tools
+
+**Your Stress Score:** {{stressLevel}}/5
+
+If you score 3 or higher, use these three evidence-backed tools:
+
+**Tool 1: Box Breathing (5 minutes)**
+- Inhale 4 counts, hold 4, exhale 4, hold 4
+- Do 5 rounds when stress spikes
+- Activates parasympathetic nervous system in minutes (Laborde et al., 2016)
+
+**Tool 2: Movement as Stress Relief (20–30 minutes)**
+- Any moderate activity (walk, yoga, strength) reduces cortisol comparable to anti-anxiety medication
+- Walking counts. Intensity doesn't matter for stress relief
+- Do 3x per week minimum
+
+**Tool 3: Sleep Debt Compounds Stress**
+- One night of poor sleep increases amygdala (fear center) reactivity by 60% (Walker, 2017)
+- Fix sleep first. Stress tools work better when rested
+
+---
+
+## PAGE 5: YOUR 30-DAY START
+
+### Week 1: Sleep Foundation
+- Set one wake time. Commit to it every day.
+- Get 20–30 minutes morning light within 1 hour of waking
+- Start a simple sleep log (bedtime, wake time, quality 1–10)
+
+### Week 2: Add Meal Consistency
+- Define your 10–12 hour eating window
+- Eat breakfast within 2 hours of waking
+- Drink 500ml water on waking
+
+### Week 3: Add Movement
+- 20-minute walk or light workout, morning or midday, 3x this week
+- Journal energy levels before and after each session
+- Notice: How do you feel the rest of the day?
+
+### Week 4: Assess & Reset
+- How's your energy? Sleep quality improved?
+- Which changes stuck? Which didn't?
+- What's working? Keep it. What's hard? Adjust.
+
+---
+
+## PAGE 6: SCIENCE-BACKED TESTS RECOMMENDED FOR YOU
+
+### Why Test?
+Blood work shows what's actually happening inside, beyond what you feel. Baseline testing tells you what to improve; retesting at 90 days shows what's working.
+
+### Recommended Panel (Order through any lab; discuss with your doctor)
+
+**Basic Metabolic Panel (CMP)**
+- Cost: ₹500–800
+- Checks: Glucose, kidney function, liver function, electrolytes
+- Why: Shows how your body tolerates food and handles stress
+- Baseline + 90 days
+
+**Lipid Panel**
+- Cost: ₹400–600
+- Checks: Total cholesterol, LDL, HDL, triglycerides
+- Why: Baseline cardiovascular health
+- Baseline + 90 days
+
+**Fasting Glucose**
+- Cost: ₹200–400
+- Checks: Blood sugar control
+- Why: Early sign of metabolic issues or excellent metabolic health
+- Baseline + 90 days
+
+**Thyroid Function (TSH, Free T4)**
+- Cost: ₹600–900
+- Checks: Thyroid activity (governs metabolism, energy, mood)
+- Why: Hidden thyroid issues affect energy, weight, mood
+- Baseline only
+
+**Vitamin D (25-hydroxyvitamin D)**
+- Cost: ₹400–700
+- Checks: Your vitamin D level
+- Why: Linked to immunity, mood, bone health, and metabolic rate
+- Baseline + 90 days (especially if you live indoors or in a low-sunlight area)
+
+---
+
+## References & Evidence
+
+Chang, A. M., et al. (2015). Evening Use of Light-Emitting eReaders Negatively Affects Sleep, Circadian Timing, and Next-Morning Alertness. PNAS, 112(4), 1232–1237.
+
+Helms, E. R., et al. (2014). Evidence-Based Recommendations for Natural Bodybuilding Contest Preparation. Journal of Sports Medicine & Physical Fitness, 54(2), 171–186.
+
+Laborde, S., et al. (2016). The Capacity to Regulate Emotions is Associated with Prolonged Survival in Aging. Journal of Aging Research, 2016, 9816148.
+
+Popkin, B. M., et al. (2010). Water, Hydration, and Health. Nutrition Reviews, 68(8), 439–458.
+
+Schoch, F. B., et al. (2016). Exercise as a Treatment for Depression: A Meta-Analysis. Journal of Psychiatric Research, 77, 42–51.
+
+Schoenfeld, B. J., et al. (2016). Dose-Response Relationships Between Exercise Volume and Muscle Hypertrophy. Sports Medicine, 46(11), 1689–1697.
+
+Slavich, G. M., & Irwin, M. R. (2014). From Stress to Inflammation and Major Depressive Disorder. Psychological Bulletin, 140(3), 774–815.
+
+Walker, M. (2017). Why We Sleep. Scribner.
+
+---
+
+## Next Step
+
+This Free Blueprint gives you the foundation. Ready to go deeper?
+
+**Essential Blueprint (₹599)** adds personalized meal timing, movement plans, and sleep optimization specific to your schedule.
+
+**Premium Blueprint (₹1,499)** adds calorie/macro optimization, a 5-day training program, supplement strategy, and blood work interpretation.
+
+**Complete Coaching (₹9,999)** adds a real coach: weekly check-ins, form review, and personalized adjustments.
+
+Choose what fits your goals and budget. All start with your quiz data—no repetition.
 `,
 };
 
 // ESSENTIAL BLUEPRINT - Structured beginner plan
 export const ESSENTIAL_BLUEPRINT: Product = {
   id: "essential-blueprint",
+  planId: PLAN_IDS.ESSENTIAL,
   name: "Essential Blueprint",
-  description: "Personalized meal timing and movement framework",
+  description: "Personalized meal timing and macro framework. Daily movement and beginner training plan. 7-day meal structure with Indian examples. Basic supplement guidance. Weekly accountability checklist. Approx. 10-page PDF, personalized for {{userName}}.",
   price: 599,
   color: "blue",
   icon: "star",
   link: "/buy-essential",
+  pageCount: 10,
   details: [
-    "Meal timing customized to your schedule",
-    "3-day structured movement plan",
-    "Sleep environment & hygiene protocol",
-    "Stress tools for your nervous system",
-    "8-week progress tracking system",
+    "Personalized meal timing and macro framework",
+    "Daily movement and beginner training plan",
+    "7-day meal structure with Indian examples",
+    "Basic supplement guidance",
     "Weekly accountability checklist",
   ],
-  pdfContent: `# ESSENTIAL BLUEPRINT
-Your Personalized 8-Week Plan
-Generated: ${new Date().toLocaleDateString()}
-Price: ₹599
-
-## YOUR CUSTOM FOUNDATION
-
-This blueprint tailors sleep, food timing, and movement to your actual schedule. Not generic advice—what works for you, based on your answers.
-
-## SECTION 1: YOUR CIRCADIAN PROFILE
-
-Circadian science shows your natural wake time, eating schedule, and activity timing must align for optimal function (Dominques et al., 2014, Nutrients). We've mapped your pattern.
-
-### Your Sleep & Wake Cycle
-[Based on quiz responses]
-- Optimal wake time: [Your time]
-- Optimal sleep onset: [Time for 7–8 hours]
-- Peak energy windows: [Morning / midday / evening]
-- Energy dip times: [When cortisol naturally drops]
-
-Action: Keep wake time within 30 minutes every day, including weekends. Even sleep hygiene fails without circadian consistency.
-
-## SECTION 2: MEAL TIMING FRAMEWORK
-
-Meal timing isn't about macros yet—it's about when you eat. Research shows eating outside your circadian window impairs glucose control, sleep, and satiety hormones (Chaix et al., 2014; Scheer et al., 2009).
-
-### Your Eating Window
-Based on your natural wake time and activity patterns:
-- Breakfast target: [Time, within 2 hours of waking]
-- Lunch target: [Time, ~6 hours after breakfast]
-- Dinner target: [Time, 2–3 hours before sleep]
-- Eating window closes: [Typically 10–12 hours]
-
-### Basic Protein + Fiber at Each Meal
-Research shows protein and fiber reduce hunger, stabilize blood glucose, and improve satiety (Veldhorst et al., 2008, American Journal of Clinical Nutrition).
-
-Each meal should have:
-- Protein source: Egg, Greek yogurt, paneer, chicken, lentils, tofu
-- Fiber source: Oat, vegetables, fruit, legume
-- Healthy fat: Olive oil, nuts, avocado, coconut oil
-
-Specific foods matched to your dietary preferences [from quiz].
-
-### Hydration Protocol
-Link between water intake and cognitive performance is strong (Edmonds et al., 2013, Appetite). Your plan:
-- Morning: 500ml within 30 minutes of waking
-- Before lunch: 250ml
-- Lunch: 250ml with food
-- Afternoon: 250ml
-- Evening: Reduce 3 hours before sleep (minimizes nighttime urination)
-- Total target: 2–2.5 liters daily [adjusted for climate and activity]
-
-## SECTION 3: MOVEMENT FRAMEWORK (3 DAYS/WEEK)
-
-Exercise physiology shows consistency beats intensity for beginners (Schoenfeld et al., 2016). Three days per week of modest activity produces better adherence and results than sporadic high effort.
-
-### Your 3-Day Weekly Structure
-
-**Day 1: Full-Body Resistance (20–30 min)**
-Light resistance or bodyweight. Progressive: Week 1–2, learn movement. Week 3–4, add weight. Week 5–8, increase reps/weight.
-- 5 min warm-up (walking, mobility)
-- 15 min: 3 sets each of 2–3 compound movements (push, pull, squat, hinge)
-- 5 min cool-down (stretching)
-Examples: Bodyweight push-ups, assisted pull-ups, goblet squats, dumbbell rows.
-
-**Day 2: Zone 2 Cardio (25–35 min)**
-"Zone 2" is conversational pace—you can speak in short sentences but not sing (Seiler & Tønnessen, 2009). This is where endurance and fat oxidation improvements happen.
-- Walk, jog, bike, swim, row—your choice
-- Pace: You can hold a conversation
-- Duration: 25–35 minutes
-- Frequency: 1x/week minimum for aerobic adaptation
-
-**Day 3: Movement + Flexibility (20–30 min)**
-Mobility work, stretching, and low-intensity activity reduce injury risk and improve movement quality (Behm et al., 2016, Applied Physiology, Nutrition & Metabolism).
-- Yoga, tai chi, Pilates, or guided stretching
-- Or: 20-minute leisurely walk + 10 minutes static stretching
-- Focus areas: Hip, shoulder, spine mobility based on your desk/activity patterns
-
-Spacing: Ideally Mon / Wed / Fri or similar (recovery days between).
-
-## SECTION 4: SLEEP PROTOCOL
-
-Eight-week evidence shows sleep is the foundation (Walker, 2017). Everything else—diet, exercise, stress tools—works better when sleep is consistent and adequate (7–9 hours).
-
-### Your Sleep Environment
-- Room temperature: 65–68°F (18–20°C) is optimal for most (Okamoto-Mizuno & Mizuno, 2012)
-- Darkness: < 5 lux (blackout curtains, eye mask)
-- Quiet: < 30 dB (earplugs, white noise if needed)
-- Bed: Comfortable mattress and pillow (critical—cheap sleep surfaces impair sleep quality)
-
-### Your Evening Routine (Start 60 Minutes Before Sleep)
-- [Your sleep time] minus 60 min: Screen cutoff. No blue light.
-- [minus 30 min]: Warm bath/shower or herbal tea (chamomile, passionflower)
-- [minus 10 min]: Dim lights. Cool room. Consistency matters more than ritual.
-
-### Sleep Supplements (If Needed)
-Magnesium glycinate (300–400mg) 60 minutes before bed is evidence-backed for sleep latency and depth (Abbasi et al., 2012). Only if poor sleep persists after 2 weeks of protocol consistency.
-
-## SECTION 5: STRESS TOOLS
-
-Chronic stress dysregulates cortisol, impairs sleep, and suppresses immunity (Slavich & Irwin, 2014). Three evidence-backed tools for your nervous system:
-
-### Tool 1: Breathing (5 minutes daily)
-Box breathing activates parasympathetic tone in 5 minutes (Laborde et al., 2016):
-- Inhale 4 counts
-- Hold 4 counts
-- Exhale 4 counts
-- Hold 4 counts
-- Repeat 5 rounds
-
-Do daily, or when stress spikes.
-
-### Tool 2: Movement (20–30 minutes, 3x/week)
-Your movement plan already covers this. But separately: Any low-to-moderate intensity activity reduces cortisol and anxiety comparable to medication (Schuch et al., 2016). Walking counts.
-
-### Tool 3: Social Connection (Minimum 1x/week)
-Loneliness increases inflammation and cortisol (Holt-Lunstad et al., 2015). 30 minutes of meaningful social interaction (in-person or video) weekly buffers stress resilience.
-
-## SECTION 6: 8-WEEK PROGRESS TRACKING
-
-### Weekly Check-In (2 minutes)
-Track:
-- Sleep hours and quality (1–10)
-- Energy level (1–10) morning / midday / evening
-- Stress level (1–10)
-- Movement sessions completed
-- Meal timing consistency (%)
-- Focus / mood (1–10)
-
-### Monthly Assessment (Week 4 & 8)
-- Photos (same time, same place, same light)
-- Measurements (waist, chest)
-- How clothes fit
-- Exercise performance (reps, weights, duration)
-- Sleep improvements
-- Energy consistency
-- Stress reactivity (getting better?)
-- Any injuries or pain changes?
-
-### Expected Timeline
-- Week 1–2: Sleep improves, energy stabilizes
-- Week 3–4: Mood lifts, stress response improves
-- Week 5–8: Visible changes, exercise performance increases, consistency becomes automatic
-
-## SCIENCE CITED
-
-Abbasi, B., et al. (2012). The Effect of Magnesium Supplementation on Primary Insomnia in Elderly. Journal of Research in Medical Sciences, 17(12), 1161–1169.
-
-Behm, D. G., et al. (2016). Current Concepts in Flexibility and Mobility. Applied Physiology, Nutrition & Metabolism, 41(6), S1–S11.
-
-Chaix, A., et al. (2014). Time-Restricted Feeding Is a Preventative and Therapeutic Intervention. Cell Metabolism, 20(6), 991–1005.
-
-Dominques, R., et al. (2014). Meal Timing. Nutrients, 6(10), 4694–4717.
-
-Edmonds, C. J., et al. (2013). Dehydration Impairs Cognition and Mood. Appetite, 65, 27–33.
-
-Holt-Lunstad, J., et al. (2015). Loneliness and Social Isolation as Risk Factors. Perspectives on Psychological Science, 10(2), 227–237.
-
-Laborde, S., et al. (2016). The Capacity to Regulate Emotions is Associated with Prolonged Survival in Aging. Journal of Aging Research, 2016, 9816148.
-
-Okamoto-Mizuno, K., & Mizuno, K. (2012). Effects of Thermal Environment on Sleep. Sleep Medicine Reviews, 16(4), 298–310.
-
-Scheer, F. A., et al. (2009). Impact of the Daily Timing of Physical Exercise on Biological Rhythms. PNAS, 106(34), 14069–14074.
-
-Schoenfeld, B. J., et al. (2016). Dose-Response Relationships Between Exercise Volume and Muscle Hypertrophy. Sports Medicine, 46(11), 1689–1697.
-
-Schuch, F. B., et al. (2016). Exercise as a Treatment for Depression. Journal of Psychiatric Research, 77, 42–51.
-
-Seiler, S., & Tønnessen, E. (2009). Intervals, Thresholds, and Long Slow Distance. SportScience, 13, 32–53.
-
-Slavich, G. M., & Irwin, M. R. (2014). From Stress to Inflammation and Major Depressive Disorder. Psychological Bulletin, 140(3), 774–815.
-
-Veldhorst, M. A., et al. (2008). Protein-Induced Satiety. American Journal of Clinical Nutrition, 87(5), 1562S–1569S.
-
-Walker, M. (2017). Why We Sleep. Scribner.
-
----
-
-Ready for advanced optimization? Premium Blueprint adds personalized nutrient strategy, advanced fitness periodization, and blood work recommendations.
-`,
 };
 
 // PREMIUM BLUEPRINT - Advanced, detailed, high-value
 export const PREMIUM_BLUEPRINT: Product = {
   id: "premium-blueprint",
+  planId: PLAN_IDS.PREMIUM,
   name: "Premium Blueprint",
-  description: "Metabolic optimization + periodized training system",
+  description: "Calories & macro optimization for your goal. Customized 7-day meal plan with recipes and Indian grocery list. Goal-aligned training and recovery program (5+ days/week). Full supplement strategy with timing. Mental and cognitive performance section. Approx. 12-page PDF, personalized for {{userName}}.",
   price: 1499,
   color: "green",
   icon: "zap",
   link: "/buy-premium",
+  pageCount: 12,
   details: [
-    "Calorie & macro calculation for your goals",
-    "Recommended blood work panel",
-    "5-day periodized training program",
-    "Evidence-based supplement strategy",
-    "90-day nutrition & performance protocol",
-    "Monthly updates and adjustments",
+    "Calories & macro optimization for your goal",
+    "Customized 7-day meal plan with recipes",
+    "Indian grocery list by category",
+    "5-day training program with progression",
+    "Full supplement strategy with timing",
+    "Mental performance and hormone section",
     "Priority email support",
   ],
-  pdfContent: `# PREMIUM BLUEPRINT
-90-Day Advanced System
-Generated: ${new Date().toLocaleDateString()}
-Price: ₹1,499
-
-## METABOLIC FOUNDATION
-
-Your metabolic rate and calorie needs are calculated—not estimated. This section translates nutrient science into numbers specific to your goal.
-
-### Your Calculated Resting Metabolic Rate (RMR)
-Using Mifflin-St Jeor equation based on your age, sex, height, weight:
-- RMR: [X] calories/day at complete rest
-- This is your biological minimum energy expenditure
-
-### Total Daily Energy Expenditure (TDEE)
-Adding your activity level:
-- TDEE: [X] calories/day with your current activity
-- This is maintenance level—no change in body composition
-
-### Calorie Strategy by Goal
-**If losing weight:**
-- Calorie deficit: 300–500 calories below TDEE
-- This produces ~0.5 lb/week fat loss (Helms et al., 2014)
-- Target protein: 1.8–2.2 g/kg to preserve muscle (Helms et al., 2014)
-
-**If gaining muscle:**
-- Calorie surplus: 300–500 calories above TDEE
-- This supports muscle protein synthesis (Schoenfeld et al., 2016)
-- Target protein: 1.8–2.2 g/kg for hypertrophy
-
-**If maintaining:**
-- Eat at TDEE
-- Protein: 1.6–1.8 g/kg for health and body composition
-
-### Your Macronutrient Targets
-Based on your goal and activity level:
-- Protein: [X]g/day ([Y]% of calories)
-- Carbohydrates: [X]g/day ([Y]% of calories)
-- Fat: [X]g/day ([Y]% of calories)
-
-Ratios matter because protein preserves muscle, carbs fuel performance, and fat supports hormones and satiety.
-
-## RECOMMENDED BLOOD WORK PANEL
-
-Evidence-based testing informs your personalization and tracks adaptation (Helms et al., 2014). Testing before, at week 6, and week 12 shows what's working.
-
-### Core Panel (Baseline + Week 12)
-- Complete Metabolic Panel (glucose, kidney, liver, electrolytes)
-- Lipid Panel (cholesterol, LDL, HDL, triglycerides)
-- Thyroid Function (TSH, Free T4)
-- Vitamin D (25-hydroxyvitamin D)
-- Iron status (ferritin, serum iron, TIBC)
-- Hemoglobin (anaemia screening)
-
-### Why Each Matters
-- Glucose & insulin: Shows how your body tolerates carbs
-- Lipids: Baseline cardiovascular health
-- Thyroid: Confirms metabolic rate assumptions
-- Vitamin D: Linked to immunity, mood, bone health
-- Iron: Women especially—low iron impairs performance and mood
-
-Talk to your doctor. These tests cost ₹2,000–4,000 in India.
-
-## 5-DAY PERIODIZED TRAINING SYSTEM
-
-Periodization—varying volume, intensity, and movement patterns—produces better strength and muscle gains than random training (Schoenfeld et al., 2016). Five days/week allows focused stimulus and adequate recovery.
-
-### Your 5-Day Split
-Day 1: Lower Body Strength (Squat emphasis)
-Day 2: Upper Body Push (Chest, shoulders, triceps)
-Day 3: Active Recovery (Walk, mobility, yoga)
-Day 4: Upper Body Pull (Back, biceps)
-Day 5: Full-Body Power (Olympic lift patterns)
-Day 6–7: Rest
-
-### Progression Model (12 Weeks)
-**Weeks 1–4: Strength Foundation**
-- Higher weight (80–85% of 1RM est.), lower reps (4–6)
-- Focus: Technique, neural adaptation
-- Volume: 12–15 sets/muscle group/week
-- Rest: 3–4 minutes between heavy sets
-
-**Weeks 5–8: Hypertrophy (Muscle)**
-- Moderate weight (65–75% of 1RM), higher reps (8–12)
-- Focus: Time under tension, metabolic stress
-- Volume: 15–20 sets/muscle group/week
-- Rest: 60–90 seconds between sets
-
-**Weeks 9–12: Power + Volume**
-- Variable intensity, explosive reps
-- Focus: Rate of force development
-- Volume: 15–18 sets/muscle group/week
-- Rest: 2–3 minutes, fully recovered
-
-### Example Day: Lower Body Strength
-
-Warm-up (5 min):
-- 30 jumping jacks, 10 bodyweight squats, 10 leg swings each direction
-
-Main Work:
-- Back squat: 5 sets x 3–5 reps (heavy, 3 min rest)
-- Romanian deadlift: 4 sets x 6–8 reps (2 min rest)
-- Leg press or hack squat: 3 sets x 8–10 reps (90 sec rest)
-- Leg curl or Nordics: 3 sets x 8–10 reps (90 sec rest)
-- Planks or core: 3 sets x max time / 20 reps (60 sec rest)
-
-Total: ~45 minutes, 16 sets/leg muscles.
-
-## SUPPLEMENT STRATEGY
-
-Supplements enhance basics—sleep, food, training—not replace them (Schoenfeld et al., 2017). This strategy is based on evidence and gaps in your diet.
-
-### Essential (Daily)
-- Creatine monohydrate: 3–5g/day (Schoenfeld et al., 2017; Kreider et al., 2017)
-  Proven: Increases strength, muscle mass, cognition. Safe at this dose.
-  
-- Vitamin D3: 2,000–4,000 IU/day (reviewed in Wacker & Holick, 2013)
-  Your level from blood work determines if you need more.
-
-- Omega-3 (EPA+DHA): 2–3g/day (Simopoulos, 2016)
-  Anti-inflammatory, supports cardiovascular and mental health.
-
-### If Your Testing Shows Deficiency
-- Vitamin B12: If low on blood test
-- Iron: Only if you test iron-deficient
-- Magnesium glycinate: If your sleep protocol alone isn't working
-
-### For Performance (Optional)
-- Caffeine: 3–6 mg/kg 30–60 min before training (Grgic et al., 2019)
-  Only if tolerated; skip if sensitive to stimulants.
-  
-- Beta-alanine: 3–5g/day split doses (Schoenfeld et al., 2017)
-  Buffers lactate in high-rep work. Noticeable in weeks 3–4.
-
-### NOT Recommended (Limited Evidence)
-- Fat burners, testosterone boosters, "metabolic enhancers"
-- Focus on the proven interventions above.
-
-### Timing
-- Creatine, Omega-3, D3: With breakfast
-- Magnesium: 60 min before sleep
-- Caffeine: 30–60 min before training
-- Food first. Supplements fill gaps.
-
-## 90-DAY NUTRITION PROTOCOL
-
-Eating patterns support your training goal.
-
-### Example Day (Calorie & Macro Target: 2,200 cal, 150g protein, 225g carbs, 73g fat)
-
-**Breakfast (7 AM)**
-2-egg omelette + 50g oats + 1 tbsp olive oil
-- 550 cal | 22g protein | 55g carbs | 18g fat
-
-**Snack (10 AM)**
-Greek yogurt 150g + 30g granola
-- 220 cal | 20g protein | 22g carbs | 4g fat
-
-**Lunch (1 PM)**
-150g chicken breast + 150g basmati rice + 100g broccoli
-- 560 cal | 45g protein | 65g carbs | 8g fat
-
-**Pre-Training Snack (3:30 PM, before 4:30 PM training)**
-1 medium banana + 20g peanut butter
-- 320 cal | 10g protein | 35g carbs | 16g fat
-
-**Dinner (7 PM)**
-150g salmon + 200g sweet potato + 100g spinach + 1 tsp olive oil
-- 550 cal | 35g protein | 48g carbs | 18g fat
-
-**Before Sleep (10 PM, optional)**
-Casein protein shake or Greek yogurt: 200 cal | 20g protein | 10g carbs | 3g fat
-
-**Total: ~2,400 cal | 152g protein | 235g carbs | 67g fat**
-
-Adjust portions up/down based on your calculated TDEE.
-
-## SCIENCE CITED
-
-Grgic, J., et al. (2019). Caffeine Ingestion and Muscle Strength: A Meta-Analysis. Journal of the International Society of Sports Nutrition, 16(1), 13.
-
-Helms, E. R., et al. (2014). Evidence-Based Recommendations for Natural Bodybuilding Contest Preparation. Journal of Sports Medicine & Physical Fitness, 54(2), 171–186.
-
-Kreider, R. B., et al. (2017). International Society of Sports Nutrition Position Stand: Safety and Efficacy of Creatine Supplementation. Journal of the International Society of Sports Nutrition, 14, 18.
-
-Schoenfeld, B. J., et al. (2016). Dose-Response Relationships Between Exercise Volume and Muscle Hypertrophy. Sports Medicine, 46(11), 1689–1697.
-
-Schoenfeld, B. J., et al. (2017). International Society of Sports Nutrition Position Stand: Protein and Exercise. Journal of the International Society of Sports Nutrition, 14, 20.
-
-Simopoulos, A. P. (2016). An Increase in the Omega-6/Omega-3 Fatty Acid Ratio Increases the Risk. Open Heart, 3(1), e000385.
-
-Wacker, M., & Holick, M. F. (2013). Sunlight and Vitamin D: A Global Perspective. Dermato-Endocrinology, 5(1), 51–108.
-
----
-
-Need 1-on-1 adjustments and accountability? Complete Coaching adds personalized guidance and weekly check-ins.
-`,
 };
 
 // COMPLETE COACHING - Elite, personalized, high-touch
 export const COMPLETE_COACHING: Product = {
   id: "complete-coaching",
+  planId: PLAN_IDS.COACHING,
   name: "Complete Coaching",
-  description: "12-week personalized coaching program with weekly support",
-  price: 9999, // 3-month flat rate; can also offer ₹3,999/month
+  description: "Everything in Premium plus: Strategy session and form review. Weekly accountability + form checks (first 8–12 weeks). WhatsApp messaging support. Habit and behavior change coaching. Periodic reassessment and re-programming. Approx. 14–16-page PDF, personalized for {{userName}}.",
+  price: 9999,
   color: "orange",
   icon: "heart",
   link: "/buy-coaching",
+  pageCount: 15,
   details: [
     "Two 1-on-1 strategy sessions (60 min each)",
     "Weekly accountability & form checks",
@@ -584,135 +368,8 @@ export const COMPLETE_COACHING: Product = {
     "Video form review for your lifts",
     "Behavior-change coaching & habit building",
     "Monthly progress assessments",
-    "Private community access",
+    "Habit systems and implementation planning",
   ],
-  pdfContent: `# COMPLETE COACHING
-12-Week Personalized Program
-Generated: ${new Date().toLocaleDateString()}
-Price: ₹9,999 for 3 months (or ₹3,999/month)
-
-## YOU GET A COACH
-
-This isn't just information. It's a real person who reviews your work, adjusts your plan, and keeps you accountable.
-
-## WEEK 1: ASSESSMENT & CUSTOMIZATION
-
-### Session 1 (60 minutes): Your Baseline
-- Detailed review of your health history, injuries, goals
-- Movement assessment (how you squat, deadlift, push, pull)
-- Lifestyle audit (sleep, stress, work, recovery)
-- Goal clarification: What does success look like?
-- Personalized training & nutrition plan creation
-
-### Session 2 (60 minutes, Week 2): Deep Dive Implementation
-- Detailed walkthrough of your nutrition plan (meal prep, timing, food choices)
-- Training plan review (how to perform each exercise, progression)
-- Sleep protocol optimization for your specific schedule
-- Stress tools matched to your preferences
-- Success metrics definition—how we measure progress
-
-## WEEKS 1–12: WEEKLY ACCOUNTABILITY
-
-### What Happens Each Week
-- You submit: Photos, body weight, workouts completed, nutrition adherence, sleep logs, stress/mood
-- Coach reviews and provides: Form corrections (video analysis if needed), nutrition tweaks, training progression, motivation, barriers troubleshooting
-- Direct messaging: You ask questions; I answer within 24–48 hours
-- Biweekly check-in calls: 15–20 min progress review + plan adjustments
-
-### Example Week Check-In
-Mon: You log your training (squat, bench, deadlift videos uploaded if form question)
-Wed: I review form, suggest tweaks, adjust weights for next session
-Fri: You submit nutrition adherence and sleep logs
-Sat: I review, suggest meal timing shifts or food swaps if needed
-Sun: You book time for weekly call
-
-## BEHAVIOR CHANGE COMPONENT
-
-The biggest gap between plans and results is behavior. This program includes:
-
-- **Habit stacking**: Linking new behaviors to existing routines (e.g., "after morning coffee, I take vitamin D")
-- **Barrier ID**: What's preventing consistency? We remove obstacles.
-- **Accountability design**: Your check-in style (e.g., daily logs vs. weekly summary; public vs. private)
-- **Motivation tuning**: Why does your goal matter? We keep it clear and connected.
-- **Progress celebration**: Wins matter, small and large.
-
-Research shows coaching+behavior change produces 3–4x better adherence than plans alone (Teixeira et al., 2015).
-
-## FORM REVIEW & INJURY PREVENTION
-
-One of coaching's biggest benefits: You never perform an exercise wrong for 8 weeks.
-
-- Video submission: You record a set or rep of your main lifts
-- Analysis: Form cues, corrections, regressions if needed
-- Safety: Injury prevention is embedded, not an afterthought
-
-## MONTHLY DEEP-DIVE ASSESSMENT (Weeks 4, 8, 12)
-
-Full progress evaluation:
-- Photos, weight, measurements
-- Strength metrics (how much weight, how many reps?)
-- Energy, sleep, mood, stress levels
-- Lab review (if done: comparing to baseline)
-- Plan adjustments based on adaptation
-- Next month's focus (double down on what's working; pivot what isn't)
-
-## COMMUNITY ACCESS
-
-Private community of other coaching clients:
-- Meal ideas and recipes
-- Workout motivation and support
-- Q&A with coach and peers
-- Monthly group challenge (optional)
-- No judgment, high accountability
-
-## WHAT'S INCLUDED
-
-✅ Personalized training plan (12 weeks, auto-progressively adjusted)
-✅ Nutrition plan (calorie, macro, meal timing customized to your life)
-✅ Sleep & stress protocol personalized
-✅ Blood work recommendations and interpretation
-✅ Supplement strategy (only evidence-backed)
-✅ Weekly accountability
-✅ Form review (unlimited video submissions)
-✅ 24–48 hour support response (email/messaging)
-✅ Monthly assessments and adjustments
-✅ Behavior-change coaching
-✅ Private community access
-
-## EXPECTED TIMELINE
-
-**Weeks 1–2:** Foundation + baseline habits
-- Sleep consistency improves
-- Meal timing lock-in
-- Training momentum begins
-
-**Weeks 3–6:** Visible adaptation
-- Strength gains (neural adaptation)
-- Slight body composition change
-- Energy consistency
-- Exercise performance improves
-
-**Weeks 7–10:** Acceleration
-- Strength/muscle gains accelerate
-- Noticeable visual changes
-- Stress resilience improves
-- Habits feel automatic
-
-**Weeks 11–12:** Integration
-- Habits are lifestyle now
-- Plan for long-term (beyond coaching)
-- Sustainability strategy
-- Reflect on wins
-
-## SCIENCE CITED
-
-Teixeira, P. J., et al. (2015). Exercise, Physical Activity, and Self-Determination Theory: A Systematic Review. International Journal of Behavioral Nutrition & Physical Activity, 12(1), 154.
-
----
-
-**Ready to start? Click below to book your first session.**
-/contact-coach
-`,
 };
 
 // PRODUCTS ARRAY FOR BACKWARDS COMPATIBILITY
@@ -727,89 +384,110 @@ export const getProductById = (id: string): Product | undefined => {
   return products.find((p) => p.id === id);
 };
 
+export const getProductByPlanId = (planId: string): Product | undefined => {
+  return products.find((p) => p.planId === planId);
+};
+
 // PREMIUM ADD-ONS - Six distinct, evidence-based micro-products
 export const addOns: AddOn[] = [
   {
-    id: "dna-analysis",
+    id: ADDON_IDS.DNA,
     name: "DNA Analysis Add-on",
-    description:
-      "Genetic insight into nutrient absorption, caffeine sensitivity, and exercise response",
+    description: "Genetic insight into nutrient absorption, caffeine sensitivity, and exercise response",
     price: 1499,
     icon: "dna",
+    pageCountAddition: 3,
     features: [
       "MTHFR methylation status (folate processing)",
       "CYP1A2 caffeine metabolism (fast vs. slow)",
       "ACTN3 muscle fiber type (power vs. endurance)",
       "What your genes can't predict (limitations explained)",
+      "Practical modifications to training and nutrition",
+      "Gene-specific test recommendations",
     ],
   },
   {
-    id: "advanced-supplement-stack",
+    id: ADDON_IDS.SUPPLEMENT,
     name: "Advanced Supplement Stack",
-    description:
-      "Lab-backed supplement protocol specific to your deficiencies and goals",
+    description: "Lab-backed supplement protocol specific to your deficiencies and goals",
     price: 2999,
     icon: "pill",
+    pageCountAddition: 3,
     features: [
       "Deficiency testing interpretation",
-      "Personalized 7–10 supplement protocol",
+      "Periodized 12-week supplement protocol",
       "Sourcing guide (brands, vendors)",
       "Timing and stacking strategy",
+      "Supplement phases (loading, maintenance, deload)",
+      "Lab tests that determine necessity",
     ],
   },
   {
-    id: "athletic-performance",
+    id: ADDON_IDS.ATHLETE,
     name: "Athletic Performance Add-on",
-    description:
-      "Sport-specific training, energy systems, and fuel-timing strategy",
+    description: "Sport-specific training, energy systems, and fuel-timing strategy",
     price: 1999,
     icon: "target",
+    pageCountAddition: 2,
     features: [
-      "Sport-specific periodization (12-week protocol)",
+      "Sport-specific 12-week periodization",
       "Energy system training (aerobic, lactate, alactic)",
       "Fueling strategy for competition",
       "Recovery protocols post-competition",
+      "Performance metrics to track (HRV, VO2max, time trials)",
+      "Advanced lab testing for athletes",
     ],
   },
   {
-    id: "family-nutrition",
+    id: ADDON_IDS.FAMILY,
     name: "Family Nutrition Plan",
     description: "Extend your plan to up to 4 family members with customized blueprints",
     price: 3499,
     icon: "users",
+    pageCountAddition: 4,
     features: [
       "Up to 4 family member assessments",
       "Individual meal timing frameworks",
       "Family-friendly recipes (accommodating all)",
       "Grocery list optimization for whole household",
+      "Household-level meal structures",
+      "Shared lab tests vs. individual assessments",
     ],
   },
   {
-    id: "womens-hormonal-health",
+    id: ADDON_IDS.WOMEN_HORMONE,
     name: "Women's Hormonal Health Add-on",
-    description:
-      "Menstrual cycle nutrition, PCOS/thyroid support, and hormone-aware training",
+    description: "Menstrual cycle nutrition, PCOS/thyroid support, and hormone-aware training",
     price: 1799,
     icon: "heart",
+    pageCountAddition: 2,
     features: [
       "Menstrual cycle-synced nutrition (follicular/luteal)",
       "PCOS insulin-sensitivity strategies",
       "Thyroid-supporting protocols",
       "Training adjustments by cycle phase",
+      "Conservative condition explanations",
+      "Priority hormone-related lab tests (TSH, LH/FSH, prolactin)",
     ],
   },
   {
-    id: "mens-fitness-optimization",
+    id: ADDON_IDS.MEN_FITNESS,
     name: "Men's Fitness Optimization Add-on",
-    description:
-      "Muscle-building framework, testosterone-supporting habits, and strength progressions",
+    description: "Muscle-building framework, testosterone-supporting habits, and strength progressions",
     price: 1799,
     icon: "zap",
+    pageCountAddition: 2,
     features: [
       "Muscle-building nutrition (calorie surplus, protein timing)",
       "Testosterone-supporting sleep and strength training",
       "Progressive overload programming (12 weeks)",
       "Performance plateau-breaking strategies",
+      "Recovery and strength progression strategies",
+      "Relevant lab tests (lipid panel, fasting glucose, testosterone if age/symptoms justify)",
     ],
   },
 ];
+
+export const getAddOnById = (id: string): AddOn | undefined => {
+  return addOns.find((ao) => ao.id === id);
+};
