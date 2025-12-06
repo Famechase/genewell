@@ -151,38 +151,8 @@ export default function QuizResults() {
     setAnalysisComplete(true);
   }, [navigate]);
 
-  const handlePayment = async () => {
-    if (!email || !selectedPlan || !analysisId) return;
-
-    setIsProcessing(true);
-
-    try {
-      const amount = planFeatures[selectedPlan as keyof typeof planFeatures]?.price || 0;
-      const resp = await fetch("/api/wellness/payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ analysisId, email, planType: selectedPlan, amount }),
-      });
-      if (!resp.ok) throw new Error("Payment API failed");
-      const data = await resp.json();
-
-      localStorage.setItem(
-        "purchaseData",
-        JSON.stringify({
-          email,
-          name,
-          plan: selectedPlan,
-          quizData,
-          analysisId,
-          downloadUrl: data.downloadUrl,
-          purchaseDate: new Date().toISOString(),
-        }),
-      );
-      navigate("/download");
-    } catch (error) {
-      console.error("Payment failed:", error);
-      setIsProcessing(false);
-    }
+  const handleContinueToPricing = () => {
+    navigate("/pricing");
   };
 
   if (!quizData) {
