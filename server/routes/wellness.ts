@@ -194,22 +194,29 @@ export const handleWellnessPurchase: RequestHandler = async (req, res) => {
 export const handlePDFDownload: RequestHandler = async (req, res) => {
   try {
     const { pdfRecordId } = req.params;
+    console.log(`PDF Download requested for: ${pdfRecordId}`);
 
     const pdfRecord = getPDFRecord(pdfRecordId);
     if (!pdfRecord) {
+      console.error(`PDF record not found: ${pdfRecordId}`);
+      console.log(`Available PDF records: ${Array.from((STORAGE.pdfRecords || new Map()).keys()).join(", ")}`);
       return res.status(404).json({
         success: false,
         message: "PDF not found",
       });
     }
 
+    console.log(`PDF record found:`, pdfRecord);
     const buffer = getPDFBuffer(pdfRecordId);
     if (!buffer) {
+      console.error(`PDF buffer not accessible: ${pdfRecord.filepath}`);
       return res.status(404).json({
         success: false,
         message: "PDF file not accessible",
       });
     }
+
+    console.log(`Sending PDF: ${pdfRecord.filename}, size: ${buffer.length} bytes`);
 
     // Send as download
     res.setHeader("Content-Type", "application/pdf");
