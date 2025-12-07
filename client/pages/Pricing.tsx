@@ -92,7 +92,7 @@ export default function Pricing() {
     setSelectedAddOns((prev) =>
       prev.includes(addonId)
         ? prev.filter((id) => id !== addonId)
-        : [...prev, addonId]
+        : [...prev, addonId],
     );
   };
 
@@ -171,7 +171,8 @@ export default function Pricing() {
             Evidence-Based Wellness, Every Budget
           </h1>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-8">
-            Science-backed plans personalized to your sleep, nutrition, training, and stress. No pseudoscience. No gimmicks.
+            Science-backed plans personalized to your sleep, nutrition,
+            training, and stress. No pseudoscience. No gimmicks.
           </p>
         </div>
 
@@ -213,7 +214,8 @@ export default function Pricing() {
                     {plan.name}
                   </CardTitle>
                   <CardDescription className="text-slate-600 text-sm">
-                    {plan.pageCount} page{plan.pageCount !== 1 ? "s" : ""} personalized for you
+                    {plan.pageCount} page{plan.pageCount !== 1 ? "s" : ""}{" "}
+                    personalized for you
                   </CardDescription>
 
                   <div className="pt-4">
@@ -238,15 +240,15 @@ export default function Pricing() {
                       plan.popular
                         ? "bg-gradient-to-r from-blue-600 to-cyan-600 hover:opacity-90 text-white"
                         : selectedPlanId === plan.id
-                        ? "bg-blue-600 text-white"
-                        : ""
+                          ? "bg-blue-600 text-white"
+                          : ""
                     }`}
                     variant={
                       selectedPlanId === plan.id
                         ? "default"
                         : plan.popular
-                        ? "default"
-                        : "outline"
+                          ? "default"
+                          : "outline"
                     }
                   >
                     {selectedPlanId === plan.id ? (
@@ -382,21 +384,31 @@ export default function Pricing() {
                       {plans.find((p) => p.id === selectedPlanId)?.name}
                     </p>
                     <p className="text-xs text-slate-500 mt-1">
-                      ₹{plans.find((p) => p.id === selectedPlanId)?.price.toLocaleString("en-IN") || 0}
+                      ₹
+                      {plans
+                        .find((p) => p.id === selectedPlanId)
+                        ?.price.toLocaleString("en-IN") || 0}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-slate-600">Selected Add-Ons</p>
                     <p className="font-semibold text-slate-900">
                       {selectedAddOns.length > 0
-                        ? selectedAddOns.map((id) => addOns.find((a) => a.id === id)?.name).join(", ")
+                        ? selectedAddOns
+                            .map((id) => addOns.find((a) => a.id === id)?.name)
+                            .join(", ")
                         : "None"}
                     </p>
                     {selectedAddOns.length > 0 && (
                       <p className="text-xs text-slate-500 mt-1">
                         +₹
                         {selectedAddOns
-                          .reduce((sum, id) => sum + (addOns.find((a) => a.id === id)?.price || 0), 0)
+                          .reduce(
+                            (sum, id) =>
+                              sum +
+                              (addOns.find((a) => a.id === id)?.price || 0),
+                            0,
+                          )
                           .toLocaleString("en-IN")}
                       </p>
                     )}
@@ -439,7 +451,9 @@ export default function Pricing() {
                 Is this really personalized?
               </h3>
               <p className="text-slate-700 text-sm">
-                Yes. Your 25-question quiz captures sleep patterns, activity level, stress profile, dietary preferences, and health history. Your plan reflects your actual life, not generic advice.
+                Yes. Your 25-question quiz captures sleep patterns, activity
+                level, stress profile, dietary preferences, and health history.
+                Your plan reflects your actual life, not generic advice.
               </p>
             </div>
 
@@ -448,7 +462,9 @@ export default function Pricing() {
                 What if I start Free and want to upgrade?
               </h3>
               <p className="text-slate-700 text-sm">
-                No problem. Your quiz data carries forward. Upgrade anytime. Premium includes everything Essential covers, plus advanced metrics and training periodization.
+                No problem. Your quiz data carries forward. Upgrade anytime.
+                Premium includes everything Essential covers, plus advanced
+                metrics and training periodization.
               </p>
             </div>
 
@@ -457,7 +473,10 @@ export default function Pricing() {
                 What makes this different from other apps?
               </h3>
               <p className="text-slate-700 text-sm">
-                Evidence-based only. Every recommendation is backed by peer-reviewed research (sleep neurobiology, exercise science, clinical nutrition, behavioral psychology). No metabolic types. No body type classifications. No pseudoscience.
+                Evidence-based only. Every recommendation is backed by
+                peer-reviewed research (sleep neurobiology, exercise science,
+                clinical nutrition, behavioral psychology). No metabolic types.
+                No body type classifications. No pseudoscience.
               </p>
             </div>
 
@@ -466,7 +485,8 @@ export default function Pricing() {
                 Do you offer refunds?
               </h3>
               <p className="text-slate-700 text-sm">
-                Yes. 30-day money-back guarantee on Premium and Coaching if you're not satisfied. Free tier is always free.
+                Yes. 30-day money-back guarantee on Premium and Coaching if
+                you're not satisfied. Free tier is always free.
               </p>
             </div>
 
@@ -475,7 +495,10 @@ export default function Pricing() {
                 How is Coaching different from Premium?
               </h3>
               <p className="text-slate-700 text-sm">
-                Premium is self-directed with tools and structure. Coaching adds a real person: weekly check-ins, video form review, behavior-change coaching, adjustments based on YOUR progress, and direct messaging support.
+                Premium is self-directed with tools and structure. Coaching adds
+                a real person: weekly check-ins, video form review,
+                behavior-change coaching, adjustments based on YOUR progress,
+                and direct messaging support.
               </p>
             </div>
 
@@ -484,7 +507,10 @@ export default function Pricing() {
                 Do you use DNA testing?
               </h3>
               <p className="text-slate-700 text-sm">
-                Optional. DNA Analysis Add-on (₹1,499) provides insights into nutrient processing, caffeine sensitivity, and exercise response based on genetic markers. But it's not required—your quiz data is powerful alone.
+                Optional. DNA Analysis Add-on (₹1,499) provides insights into
+                nutrient processing, caffeine sensitivity, and exercise response
+                based on genetic markers. But it's not required—your quiz data
+                is powerful alone.
               </p>
             </div>
           </div>
@@ -496,7 +522,8 @@ export default function Pricing() {
             Still have questions?
           </h3>
           <p className="text-slate-600 mb-6">
-            Our team is here to help you choose the right plan for your wellness journey
+            Our team is here to help you choose the right plan for your wellness
+            journey
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <a href="mailto:support@genewell.com">
@@ -508,7 +535,11 @@ export default function Pricing() {
                 Email Support
               </Button>
             </a>
-            <a href="https://calendly.com/genewell" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://calendly.com/genewell"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Button className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white">
                 <Phone className="mr-2 h-4 w-4" />
                 Schedule Call

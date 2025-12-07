@@ -50,19 +50,24 @@ export default function Download() {
 
   // Get configuration from state or localStorage
   const [configuration, setConfiguration] = useState<PlanConfiguration | null>(
-    null
+    null,
   );
 
   useEffect(() => {
     const currentAnalysisId = localStorage.getItem("analysisId");
 
-    const stateConfig = location.state?.configuration || location.state?.planId
-      ? {
-          planId: location.state?.planId || location.state?.configuration?.planId,
-          selectedAddOns: location.state?.addOns || location.state?.configuration?.selectedAddOns || [],
-          totalPrice: location.state?.configuration?.totalPrice || 0,
-        }
-      : JSON.parse(localStorage.getItem("planConfiguration") || "null");
+    const stateConfig =
+      location.state?.configuration || location.state?.planId
+        ? {
+            planId:
+              location.state?.planId || location.state?.configuration?.planId,
+            selectedAddOns:
+              location.state?.addOns ||
+              location.state?.configuration?.selectedAddOns ||
+              [],
+            totalPrice: location.state?.configuration?.totalPrice || 0,
+          }
+        : JSON.parse(localStorage.getItem("planConfiguration") || "null");
 
     setConfiguration(stateConfig);
 
@@ -70,7 +75,9 @@ export default function Download() {
       generatePDF(stateConfig);
     } else if (stateConfig && !currentAnalysisId) {
       // Configuration exists but no analysis ID
-      setError("Please complete the quiz first to generate your personalized blueprint.");
+      setError(
+        "Please complete the quiz first to generate your personalized blueprint.",
+      );
       setIsLoading(false);
     }
   }, [location.state]);
@@ -85,7 +92,9 @@ export default function Download() {
       const savedQuizData = localStorage.getItem("quizData");
 
       if (!freshAnalysisId) {
-        throw new Error("Analysis ID not found. Please complete the quiz first.");
+        throw new Error(
+          "Analysis ID not found. Please complete the quiz first.",
+        );
       }
 
       // Convert plan ID to tier name (remove "_blueprint" suffix)
@@ -122,7 +131,9 @@ export default function Download() {
         planTier: config.planId,
         userName: quizData.userName || "User",
         generatedAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        expiresAt: new Date(
+          Date.now() + 30 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
         downloadUrl: data.downloadUrl,
         pageCount: totalPages,
       });
@@ -166,7 +177,7 @@ export default function Download() {
 
     try {
       const response = await fetch(
-        `/api/wellness/download-pdf-base64/${pdfData.pdfRecordId}`
+        `/api/wellness/download-pdf-base64/${pdfData.pdfRecordId}`,
       );
       if (!response.ok) throw new Error("Failed to load PDF");
 
@@ -174,7 +185,7 @@ export default function Download() {
       const newWindow = window.open();
       if (newWindow) {
         newWindow.document.write(
-          `<iframe src="${data.pdfUrl}" style="width:100%;height:100%;border:none;" />`
+          `<iframe src="${data.pdfUrl}" style="width:100%;height:100%;border:none;" />`,
         );
       }
     } catch (err) {
@@ -193,7 +204,8 @@ export default function Download() {
               Quiz Required
             </h1>
             <p className="text-slate-600 mb-6">
-              Your wellness blueprint is personalized based on your quiz responses. Please complete the wellness quiz first to get started.
+              Your wellness blueprint is personalized based on your quiz
+              responses. Please complete the wellness quiz first to get started.
             </p>
             <Button
               onClick={() => navigate("/quiz")}
@@ -227,9 +239,10 @@ export default function Download() {
   }
 
   const plan = getProductByPlanId(configuration?.planId || "free_blueprint");
-  const selectedAddOns = configuration?.selectedAddOns
-    .map((id) => getAddOnById(id))
-    .filter(Boolean) || [];
+  const selectedAddOns =
+    configuration?.selectedAddOns
+      .map((id) => getAddOnById(id))
+      .filter(Boolean) || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col">
@@ -243,11 +256,7 @@ export default function Download() {
               </div>
               <span className="font-bold text-lg text-blue-900">Genewell</span>
             </Link>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/quiz")}
-            >
+            <Button variant="ghost" size="sm" onClick={() => navigate("/quiz")}>
               <ArrowLeft className="mr-2 h-4 w-4" /> Take Another Quiz
             </Button>
           </div>
@@ -415,7 +424,8 @@ export default function Download() {
                     Download your blueprint
                   </h4>
                   <p className="text-sm text-slate-600 mt-1">
-                    Save the PDF to your device. It includes everything personalized to your profile.
+                    Save the PDF to your device. It includes everything
+                    personalized to your profile.
                   </p>
                 </div>
               </div>
@@ -427,7 +437,8 @@ export default function Download() {
                     Review and understand your plan
                   </h4>
                   <p className="text-sm text-slate-600 mt-1">
-                    Read through your personalized recommendations. They're based on your quiz answers and science-backed research.
+                    Read through your personalized recommendations. They're
+                    based on your quiz answers and science-backed research.
                   </p>
                 </div>
               </div>
@@ -439,7 +450,8 @@ export default function Download() {
                     Start implementing
                   </h4>
                   <p className="text-sm text-slate-600 mt-1">
-                    Begin with the simple actions in Week 1. Consistency beats perfection.
+                    Begin with the simple actions in Week 1. Consistency beats
+                    perfection.
                   </p>
                 </div>
               </div>
@@ -451,7 +463,8 @@ export default function Download() {
                     Track and adjust
                   </h4>
                   <p className="text-sm text-slate-600 mt-1">
-                    Use the tracking tools in your blueprint. After 4 weeks, reassess and adjust based on what's working.
+                    Use the tracking tools in your blueprint. After 4 weeks,
+                    reassess and adjust based on what's working.
                   </p>
                 </div>
               </div>

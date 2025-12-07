@@ -6,7 +6,10 @@ import {
   PaymentResponse,
   DownloadResponse,
 } from "../../shared/api";
-import { analyzeQuizData, PersonalizationData } from "../lib/personalization-engine";
+import {
+  analyzeQuizData,
+  PersonalizationData,
+} from "../lib/personalization-engine";
 import { generatePersonalizedPDF } from "../lib/pdf-generator";
 import {
   createOrGetUser,
@@ -42,7 +45,10 @@ function getTierPrice(tier: string): number {
  * POST /api/wellness/quiz
  * Handles quiz submission with personalized analysis
  */
-export const handleWellnessQuizSubmission: RequestHandler = async (req, res) => {
+export const handleWellnessQuizSubmission: RequestHandler = async (
+  req,
+  res,
+) => {
   try {
     // Validate quiz data
     const validatedData = WellnessQuizSchema.parse(req.body);
@@ -58,7 +64,7 @@ export const handleWellnessQuizSubmission: RequestHandler = async (req, res) => 
       userEmail || `user_${analysisId}@genewell.local`,
       userName || "User",
       validatedData.age,
-      validatedData.gender
+      validatedData.gender,
     );
 
     // Store quiz response
@@ -68,12 +74,16 @@ export const handleWellnessQuizSubmission: RequestHandler = async (req, res) => 
     const personalizationData: PersonalizationData = analyzeQuizData(
       validatedData,
       userName,
-      userEmail
+      userEmail,
     );
 
     // Store personalization data in memory for later PDF generation
-    STORAGE.personalizationDataCache = STORAGE.personalizationDataCache || new Map();
-    (STORAGE.personalizationDataCache as any).set(analysisId, personalizationData);
+    STORAGE.personalizationDataCache =
+      STORAGE.personalizationDataCache || new Map();
+    (STORAGE.personalizationDataCache as any).set(
+      analysisId,
+      personalizationData,
+    );
 
     const response: QuizSubmissionResponse = {
       success: true,
@@ -109,16 +119,19 @@ export const handleWellnessPurchase: RequestHandler = async (req, res) => {
     }
 
     // Get personalization data from cache, or regenerate if not found
-    const personalizationDataCache = (STORAGE.personalizationDataCache || new Map()) as any;
+    const personalizationDataCache = (STORAGE.personalizationDataCache ||
+      new Map()) as any;
     let personalizationData = personalizationDataCache.get(analysisId);
 
     // If personalization data is not in cache but quiz data is provided, regenerate it
     if (!personalizationData && quizData) {
-      console.log(`Regenerating personalization data for analysisId: ${analysisId}`);
+      console.log(
+        `Regenerating personalization data for analysisId: ${analysisId}`,
+      );
       personalizationData = analyzeQuizData(
         quizData,
         quizData.userName,
-        quizData.userEmail
+        quizData.userEmail,
       );
       // Store it in cache for future use
       personalizationDataCache.set(analysisId, personalizationData);
@@ -136,7 +149,7 @@ export const handleWellnessPurchase: RequestHandler = async (req, res) => {
       analysisId,
       planTier as any,
       addOns,
-      getTierPrice(planTier)
+      getTierPrice(planTier),
     );
 
     // Generate personalized PDF
@@ -155,7 +168,7 @@ export const handleWellnessPurchase: RequestHandler = async (req, res) => {
       analysisId,
       planTier,
       addOns,
-      personalizationData.profile.name
+      personalizationData.profile.name,
     );
 
     res.status(200).json({
@@ -200,7 +213,10 @@ export const handlePDFDownload: RequestHandler = async (req, res) => {
 
     // Send as download
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename="${pdfRecord.filename}"`);
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${pdfRecord.filename}"`,
+    );
     res.setHeader("Content-Length", buffer.length);
     res.send(buffer);
   } catch (error) {
@@ -394,7 +410,7 @@ export const handleWellnessDownload: RequestHandler = async (req, res) => {
 
     // Try to find a PDF for this analysis
     const pdfs = Array.from(STORAGE.pdfRecords.values()).filter(
-      (p) => p.analysisId === analysisId
+      (p) => p.analysisId === analysisId,
     );
 
     if (pdfs.length === 0) {
@@ -489,7 +505,9 @@ export const handleProductDownload: RequestHandler = async (req, res) => {
 // HELPER FUNCTION
 // ============================================
 
-function createBlueprintFromPersonalization(data: PersonalizationData): WellnessBlueprint {
+function createBlueprintFromPersonalization(
+  data: PersonalizationData,
+): WellnessBlueprint {
   const { profile, insights } = data;
 
   return {
