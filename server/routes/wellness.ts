@@ -99,7 +99,7 @@ export const handleWellnessQuizSubmission: RequestHandler = async (req, res) => 
  */
 export const handleWellnessPurchase: RequestHandler = async (req, res) => {
   try {
-    const { analysisId, planTier, addOns = [] } = req.body;
+    const { analysisId, planTier, addOns = [], quizData } = req.body;
 
     if (!analysisId || !planTier) {
       return res.status(400).json({
@@ -108,9 +108,21 @@ export const handleWellnessPurchase: RequestHandler = async (req, res) => {
       });
     }
 
-    // Get personalization data
+    // Get personalization data from cache, or regenerate if not found
     const personalizationDataCache = (STORAGE.personalizationDataCache || new Map()) as any;
-    const personalizationData = personalizationDataCache.get(analysisId);
+    let personalizationData = personalizationDataCache.get(analysisId);
+
+    // If personalization data is not in cache but quiz data is provided, regenerate it
+    if (!personalizationData && quizData) {
+      console.log(`Regenerating personalization data for analysisId: ${analysisId}`);
+      personalizationData = analyzeQuizData(
+        quizData,
+        quizData.userName,
+        quizData.userEmail
+      );
+      // Store it in cache for future use
+      personalizationDataCache.set(analysisId, personalizationData);
+    }
 
     if (!personalizationData) {
       return res.status(404).json({
