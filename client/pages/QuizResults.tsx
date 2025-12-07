@@ -8,204 +8,45 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Sparkles,
   CheckCircle,
-  Crown,
-  Download,
-  Mail,
-  User,
-  CreditCard,
-  Lock,
-  Star,
+  ArrowRight,
   Brain,
   Heart,
-  Target,
   Clock,
   Zap,
-  FileText,
-  ArrowRight,
-  Gift,
   ArrowLeft,
 } from "lucide-react";
 import LegalFooter from "@/components/LegalFooter";
 
-const planFeatures = {
-  "free": {
-    name: "Free Blueprint",
-    price: 0,
-    features: [
-      "Complete lifestyle questionnaire analysis",
-      "Basic body type classification",
-      "Simple meal timing recommendations",
-      "General fitness guidance",
-      "Sleep hygiene tips",
-    ],
-    icon: Gift,
-    color: "from-gray-500 to-gray-600",
-  },
-  "essential": {
-    name: "Essential Blueprint",
-    price: 999,
-    features: [
-      "Advanced lifestyle & body composition analysis",
-      "Ayurvedic constitution mapping",
-      "15-page personalized PDF blueprint",
-      "Customized 7-day meal plan",
-      "Home-based workout routines",
-      "Supplement recommendations",
-      "Sleep optimization protocol",
-      "Stress management techniques",
-    ],
-    icon: Gift,
-    color: "from-emerald-500 to-green-600",
-  },
-  "premium": {
-    name: "Premium Blueprint",
-    price: 1999,
-    features: [
-      "Everything in Essential",
-      "Optional DNA analysis integration",
-      "Metabolic optimization insights",
-      "Customized supplement stack",
-      "Weekly meal prep guides & recipes",
-      "Advanced fitness routine (6x/week)",
-      "Mental health & cognitive optimization",
-      "Hormone balance insights",
-      "30-day progress tracking tools",
-    ],
-    icon: Star,
-    color: "from-purple-500 to-pink-600",
-  },
-  "pro": {
-    name: "Complete Coaching",
-    price: 4999,
-    features: [
-      "Everything in Premium Plan",
-      "1-on-1 wellness consultation (2 sessions)",
-      "Monthly accountability calls (3 months)",
-      "WhatsApp group support access",
-      "Custom shopping list by location",
-      "Recipe variations & meal flexibility",
-      "Advanced blood work recommendations",
-      "Family nutrition planning",
-    ],
-    icon: Crown,
-    color: "from-yellow-500 to-orange-600",
-  },
-};
-
-const recommendPlan = (
-  quiz: any,
-  blueprint: any,
-): keyof typeof planFeatures => {
-  if (!quiz || !blueprint) {
-    return "premium";
-  }
-
-  const supplementDepth = blueprint?.supplementPlan?.optional?.length || 0;
-  if (quiz.dnaUpload === "yes-upload" || quiz.medicalConditions !== "none" || supplementDepth > 2) {
-    return "pro";
-  }
-
-  if (
-    quiz.weightGoal !== "maintain" ||
-    quiz.stressLevel === "very-high" ||
-    quiz.sleepHours === "less-than-5" ||
-    supplementDepth > 0 ||
-    quiz.exercisePreference === "none"
-  ) {
-    return "premium";
-  }
-
-  return "essential";
-};
-
 export default function QuizResults() {
   const navigate = useNavigate();
   const [quizData, setQuizData] = useState<any>(null);
-  const [selectedPlan, setSelectedPlan] = useState<string>("");
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [analysisComplete, setAnalysisComplete] = useState(false);
-  const [analysisId, setAnalysisId] = useState<string>("");
   const [blueprint, setBlueprint] = useState<any>(null);
+  const [analysisComplete, setAnalysisComplete] = useState(false);
 
   useEffect(() => {
     const savedQuizData = localStorage.getItem("quizData");
     const savedAnalysisId = localStorage.getItem("analysisId");
     const savedBlueprint = localStorage.getItem("blueprint");
+
     if (!savedQuizData || !savedAnalysisId || !savedBlueprint) {
       navigate("/quiz");
       return;
     }
 
-    const parsedQuiz = JSON.parse(savedQuizData);
-    const parsedBlueprint = JSON.parse(savedBlueprint);
-
-    setQuizData(parsedQuiz);
-    setAnalysisId(savedAnalysisId);
-    setBlueprint(parsedBlueprint);
-
-    const initialPlan = recommendPlan(parsedQuiz, parsedBlueprint);
-    setSelectedPlan(initialPlan);
-    setEmail(parsedQuiz.userEmail || "");
-    setName(parsedQuiz.userName || "");
+    setQuizData(JSON.parse(savedQuizData));
+    setBlueprint(JSON.parse(savedBlueprint));
     setAnalysisComplete(true);
   }, [navigate]);
 
-  const handlePayment = async () => {
-    if (!email || !selectedPlan || !analysisId) return;
-
-    setIsProcessing(true);
-
-    try {
-      const amount = planFeatures[selectedPlan as keyof typeof planFeatures]?.price || 0;
-      const resp = await fetch("/api/wellness/payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ analysisId, email, planType: selectedPlan, amount }),
-      });
-      if (!resp.ok) throw new Error("Payment API failed");
-      const data = await resp.json();
-
-      localStorage.setItem(
-        "purchaseData",
-        JSON.stringify({
-          email,
-          name,
-          plan: selectedPlan,
-          quizData,
-          analysisId,
-          downloadUrl: data.downloadUrl,
-          purchaseDate: new Date().toISOString(),
-        }),
-      );
-      navigate("/download");
-    } catch (error) {
-      console.error("Payment failed:", error);
-      setIsProcessing(false);
-    }
+  const handleContinueToPricing = () => {
+    navigate("/pricing");
   };
 
-  if (!quizData) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="text-center">
-          <Sparkles className="h-16 w-16 text-purple-500 mx-auto mb-4 animate-spin" />
-          <h2 className="text-xl font-semibold text-gray-900">Loading...</h2>
-        </div>
-      </div>
-    );
-  }
-
-  if (!analysisComplete) {
+  if (!quizData || !analysisComplete) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
         <div className="text-center">
@@ -215,9 +56,6 @@ export default function QuizResults() {
       </div>
     );
   }
-
-  const currentPlan = planFeatures[selectedPlan as keyof typeof planFeatures];
-  const PlanIcon = currentPlan?.icon || Star;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
@@ -233,9 +71,6 @@ export default function QuizResults() {
                 <span className="font-bold text-xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                   Genewell
                 </span>
-                <div className="text-xs text-gray-500 font-medium">
-                  WELLNESS AI
-                </div>
               </div>
             </Link>
             <div className="flex items-center space-x-4">
@@ -260,8 +95,7 @@ export default function QuizResults() {
             🎉 Your Wellness Blueprint is Ready!
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Based on your responses, we've created a personalized plan that's
-            perfect for your body type, lifestyle, and goals
+            Based on your responses, we've created a personalized analysis perfect for your goals and lifestyle
           </p>
         </div>
 
@@ -300,7 +134,9 @@ export default function QuizResults() {
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Meal Timing</h3>
               <p className="text-sm text-gray-600">
-                Breakfast {blueprint?.nutritionPlan?.mealTiming?.breakfast}
+                {blueprint?.nutritionPlan?.mealTiming?.breakfast
+                  ? `Breakfast ${blueprint.nutritionPlan.mealTiming.breakfast}`
+                  : "Optimized timing"}
               </p>
             </CardContent>
           </Card>
@@ -310,254 +146,125 @@ export default function QuizResults() {
               <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Zap className="h-6 w-6 text-emerald-600" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Exercise Style</h3>
+              <h3 className="font-bold text-gray-900 mb-2">Exercise</h3>
               <p className="text-sm text-gray-600">
-                {blueprint?.fitnessRoutine?.workoutType?.[0] || "Personalized"}
+                {blueprint?.fitnessRoutine?.workoutType?.[0] || "Personalized routine"}
               </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Plan Selection */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-12">
-          {Object.entries(planFeatures).map(([planId, plan]) => {
-            const isSelected = selectedPlan === planId;
-            const isPopular = planId === "moderate-199";
-            const IconComponent = plan.icon;
-
-            return (
-              <Card
-                key={planId}
-                className={`relative cursor-pointer transition-all duration-300 ${
-                  isSelected
-                    ? "border-2 border-purple-500 shadow-2xl scale-105"
-                    : "border-2 border-gray-200 hover:border-purple-300 hover:shadow-lg"
-                } ${isPopular ? "ring-2 ring-purple-200" : ""}`}
-                onClick={() => setSelectedPlan(planId)}
-              >
-                {isPopular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1">
-                      ⭐ Most Popular
-                    </Badge>
-                  </div>
-                )}
-
-                <CardHeader className="text-center">
-                  <div
-                    className={`w-16 h-16 bg-gradient-to-r ${plan.color} rounded-2xl flex items-center justify-center mx-auto mb-4`}
-                  >
-                    <IconComponent className="h-8 w-8 text-white" />
-                  </div>
-                  <CardTitle className="text-2xl font-bold text-gray-900">
-                    {plan.name}
-                  </CardTitle>
-                  <div className="text-3xl font-bold text-purple-600">
-                    ₹{plan.price}
-                  </div>
-                  <CardDescription>One-time payment</CardDescription>
-                </CardHeader>
-
-                <CardContent>
-                  <ul className="space-y-3">
-                    {plan.features.map((feature, index) => (
-                      <li
-                        key={index}
-                        className="flex items-center space-x-2 text-sm"
-                      >
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-gray-700">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Button
-                    className={`w-full mt-6 ${
-                      isSelected
-                        ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                    onClick={() => setSelectedPlan(planId)}
-                  >
-                    {isSelected ? "Selected Plan" : "Select Plan"}
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* Checkout Form */}
-        <Card className="max-w-2xl mx-auto border-2 border-purple-200 shadow-xl">
+        {/* Next Steps Card */}
+        <Card className="max-w-2xl mx-auto border-2 border-purple-200 shadow-xl mb-12">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-gray-900 flex items-center justify-center space-x-2">
-              <CreditCard className="h-6 w-6 text-purple-600" />
-              <span>Complete Your Order</span>
+            <CardTitle className="text-2xl font-bold text-gray-900">
+              What Comes Next?
             </CardTitle>
             <CardDescription>
-              Get instant access to your personalized wellness blueprint
+              Choose your plan to unlock your personalized wellness blueprint
             </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {/* Selected Plan Summary */}
-            <div className="bg-purple-50 rounded-xl p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div
-                    className={`w-12 h-12 bg-gradient-to-r ${currentPlan?.color} rounded-xl flex items-center justify-center`}
-                  >
-                    <PlanIcon className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-900">
-                      {currentPlan?.name}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      Instant PDF download
-                    </p>
-                  </div>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-4">
+                <Badge className="mt-1 flex-shrink-0 bg-purple-600 text-white">1</Badge>
+                <div>
+                  <h4 className="font-semibold text-gray-900">Select Your Plan</h4>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Choose from Free, Essential, Premium, or Complete Coaching. Each unlocks progressively more detailed guidance.
+                  </p>
                 </div>
-                <div className="text-2xl font-bold text-purple-600">
-                  ₹{currentPlan?.price}
+              </div>
+
+              <div className="flex items-start space-x-4">
+                <Badge className="mt-1 flex-shrink-0 bg-purple-600 text-white">2</Badge>
+                <div>
+                  <h4 className="font-semibold text-gray-900">Optional Add-Ons</h4>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Enhance with DNA Analysis, Supplement Stack, Athletic Performance, or other specialized modules.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4">
+                <Badge className="mt-1 flex-shrink-0 bg-purple-600 text-white">3</Badge>
+                <div>
+                  <h4 className="font-semibold text-gray-900">Download Your Blueprint</h4>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Get your personalized PDF with your name, profile data, and actionable recommendations.
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Contact Form */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">Full Name</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="name"
-                    placeholder="Enter your full name"
-                    className="pl-10"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="email">Email Address</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="your@email.com"
-                    className="pl-10"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
+              <p className="text-sm text-gray-700">
+                <strong>💡 Tip:</strong> Your quiz data carries forward to any plan. You can always upgrade later without repeating the quiz.
+              </p>
             </div>
 
-            {/* Payment Button */}
             <Button
-              onClick={handlePayment}
-              disabled={!email || !name || isProcessing}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-6 text-lg font-semibold"
+              onClick={handleContinueToPricing}
+              size="lg"
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white font-semibold py-6 text-lg"
             >
-              {isProcessing ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <Lock className="mr-3 h-5 w-5" />
-                  Get My Blueprint Now - ₹{currentPlan?.price}
-                </>
-              )}
+              Choose Your Plan
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-
-            {/* Trust Indicators */}
-            <div className="flex flex-wrap justify-center items-center gap-6 text-gray-500 text-sm pt-4 border-t">
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>🔒 Secure Payment</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-purple-500" />
-                <span>📧 Instant Email Delivery</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-pink-500" />
-                <span>💰 30-Day Guarantee</span>
-              </div>
-            </div>
           </CardContent>
         </Card>
 
-        {/* Sample Preview */}
-        <div className="mt-12 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">
-            What You'll Get Inside
-          </h2>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-6 text-center">
-                <FileText className="h-8 w-8 text-purple-600 mx-auto mb-3" />
-                <h3 className="font-semibold text-gray-900 mb-2">
-                  15-Page PDF
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Complete wellness blueprint designed just for you
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-6 text-center">
-                <Heart className="h-8 w-8 text-red-500 mx-auto mb-3" />
-                <h3 className="font-semibold text-gray-900 mb-2">Meal Plans</h3>
-                <p className="text-sm text-gray-600">
-                  7-day meal plan with exact timings and portions
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-6 text-center">
-                <Zap className="h-8 w-8 text-orange-500 mx-auto mb-3" />
-                <h3 className="font-semibold text-gray-900 mb-2">
-                  Exercise Guide
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Home workouts designed for your body type
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-6 text-center">
-                <Target className="h-8 w-8 text-green-500 mx-auto mb-3" />
-                <h3 className="font-semibold text-gray-900 mb-2">
-                  Progress Tracker
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Weekly goals and progress monitoring tools
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="mt-8">
-            <Button variant="outline" className="px-6 py-3">
-              <Download className="mr-2 h-4 w-4" />
-              Preview Sample Report
-            </Button>
-          </div>
-        </div>
+        {/* Plan Comparison */}
+        <Card className="max-w-4xl mx-auto border-2 border-gray-200">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Plan Overview</CardTitle>
+            <CardDescription>All plans include your personalized analysis</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-300">
+                    <th className="text-left py-3 px-2 font-semibold text-gray-900">Plan</th>
+                    <th className="text-center py-3 px-2 font-semibold text-gray-900">Price</th>
+                    <th className="text-center py-3 px-2 font-semibold text-gray-900">Pages</th>
+                    <th className="text-left py-3 px-2 font-semibold text-gray-900">Focus</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-gray-200 hover:bg-gray-50">
+                    <td className="py-3 px-2 font-semibold text-gray-900">Free Blueprint</td>
+                    <td className="py-3 px-2 text-center text-gray-600">₹0</td>
+                    <td className="py-3 px-2 text-center text-gray-600">6</td>
+                    <td className="py-3 px-2 text-gray-600">Sleep, stress, basics</td>
+                  </tr>
+                  <tr className="border-b border-gray-200 hover:bg-gray-50">
+                    <td className="py-3 px-2 font-semibold text-gray-900">Essential</td>
+                    <td className="py-3 px-2 text-center text-gray-600">₹599</td>
+                    <td className="py-3 px-2 text-center text-gray-600">10</td>
+                    <td className="py-3 px-2 text-gray-600">Meal timing, workouts</td>
+                  </tr>
+                  <tr className="border-b border-gray-200 hover:bg-gray-50 bg-purple-50">
+                    <td className="py-3 px-2 font-semibold text-gray-900">Premium</td>
+                    <td className="py-3 px-2 text-center text-gray-600">₹1,499</td>
+                    <td className="py-3 px-2 text-center text-gray-600">12</td>
+                    <td className="py-3 px-2 text-gray-600">Macros, training, tests</td>
+                  </tr>
+                  <tr className="hover:bg-gray-50">
+                    <td className="py-3 px-2 font-semibold text-gray-900">Complete Coaching</td>
+                    <td className="py-3 px-2 text-center text-gray-600">₹9,999</td>
+                    <td className="py-3 px-2 text-center text-gray-600">15+</td>
+                    <td className="py-3 px-2 text-gray-600">1-on-1 support</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Footer with Legal Links */}
+      {/* Footer */}
       <LegalFooter />
     </div>
   );

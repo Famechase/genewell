@@ -247,7 +247,7 @@ export default function Index() {
                 <ul className="space-y-3 text-gray-600">
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span>Body type & metabolism analysis</span>
+                    <span>Metabolic profiling & energy analysis</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-5 w-5 text-green-500" />
@@ -282,7 +282,7 @@ export default function Index() {
                 <ul className="space-y-3 text-gray-600">
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-5 w-5 text-pink-500" />
-                    <span>Ayurveda + Modern Science</span>
+                    <span>Evidence-Based Science</span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <CheckCircle className="h-5 w-5 text-pink-500" />
@@ -543,8 +543,7 @@ export default function Index() {
               Behind Your Plan
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Our AI combines ancient Ayurvedic wisdom with cutting-edge
-              nutritional genomics
+              Our AI combines evidence-based exercise science, nutrition research, sleep neurobiology, behavioral psychology, and optional DNA insights
             </p>
           </div>
 
@@ -560,11 +559,10 @@ export default function Index() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-2">
-                      Ayurvedic Constitution Analysis
+                      Metabolic & Lifestyle Profiling
                     </h4>
                     <p className="text-gray-600">
-                      Ancient body type classification (Vata, Pitta, Kapha)
-                      combined with modern lifestyle factors.
+                      Evidence-based calculation of your basal metabolic rate, daily energy expenditure, and personalized macronutrient targets based on exercise science research.
                     </p>
                   </div>
                 </div>

@@ -8,528 +8,526 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Sparkles,
   CheckCircle,
   Download as DownloadIcon,
   Mail,
-  Star,
-  Heart,
-  Brain,
-  Target,
-  Clock,
   FileText,
-  Share2,
-  MessageCircle,
-  ArrowLeft,
-  Gift,
   AlertCircle,
-  Phone,
+  Loader,
+  ArrowLeft,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import LegalFooter from "@/components/LegalFooter";
-import { products, getProductById } from "@/lib/products";
+import {
+  getProductByPlanId,
+  getAddOnById,
+  PlanConfiguration,
+} from "@/lib/products";
+
+interface PDFData {
+  pdfRecordId: string;
+  orderId: string;
+  planTier: string;
+  userName: string;
+  generatedAt: string;
+  expiresAt: string;
+  downloadUrl: string;
+  pageCount: number;
+}
 
 export default function Download() {
   const navigate = useNavigate();
-  const [purchaseData, setPurchaseData] = useState<any>(null);
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
-  const [downloadStarted, setDownloadStarted] = useState(false);
+  const location = useLocation();
+  const [pdfData, setPdfData] = useState<PDFData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleBack = () => {
-    navigate(-1);
-  };
+  const quizData = JSON.parse(localStorage.getItem("quizData") || "{}");
+
+  // Get configuration from state or localStorage
+  const [configuration, setConfiguration] = useState<PlanConfiguration | null>(
+    null,
+  );
 
   useEffect(() => {
-    const analysisId = localStorage.getItem("analysisId");
-    if (!analysisId) {
-      navigate("/quiz");
-      return;
-    }
+    const currentAnalysisId = localStorage.getItem("analysisId");
 
-    // Get purchase data from localStorage
-    const savedQuizData = localStorage.getItem("quizData");
-    if (savedQuizData) {
-      const quizData = JSON.parse(savedQuizData);
-      setPurchaseData({
-        analysisId,
-        email: quizData.userEmail,
-        userName: quizData.userName,
-      });
-    }
+    const stateConfig =
+      location.state?.configuration || location.state?.planId
+        ? {
+            planId:
+              location.state?.planId || location.state?.configuration?.planId,
+            selectedAddOns:
+              location.state?.addOns ||
+              location.state?.configuration?.selectedAddOns ||
+              [],
+            totalPrice: location.state?.configuration?.totalPrice || 0,
+          }
+        : JSON.parse(localStorage.getItem("planConfiguration") || "null");
 
-    // Check if a specific product was selected
-    const productId = sessionStorage.getItem("selectedProductId");
-    if (productId) {
-      const product = getProductById(productId);
-      setSelectedProduct(product);
-      sessionStorage.removeItem("selectedProductId");
-    } else {
-      // Default to first product or show product selection
-      setSelectedProduct(products[0]);
-    }
-  }, [navigate]);
+    setConfiguration(stateConfig);
 
-  const handleDownload = async () => {
+    if (stateConfig && currentAnalysisId) {
+      generatePDF(stateConfig);
+    } else if (stateConfig && !currentAnalysisId) {
+      // Configuration exists but no analysis ID
+      setError(
+        "Please complete the quiz first to generate your personalized blueprint.",
+      );
+      setIsLoading(false);
+    }
+  }, [location.state]);
+
+  const generatePDF = async (config: PlanConfiguration) => {
+    setIsLoading(true);
+    setError("");
+
     try {
-      setError("");
-      setDownloadStarted(true);
+      // Read analysisId fresh from localStorage to avoid stale values
+      const freshAnalysisId = localStorage.getItem("analysisId");
+      const savedQuizData = localStorage.getItem("quizData");
 
-      if (!selectedProduct?.id) {
-        throw new Error("No product selected");
+      if (!freshAnalysisId) {
+        throw new Error(
+          "Analysis ID not found. Please complete the quiz first.",
+        );
       }
 
-      // Fetch PDF from server using product-specific endpoint
-      const response = await fetch(
-        `/api/products/download/${selectedProduct.id}`
-      );
+      // Convert plan ID to tier name (remove "_blueprint" suffix)
+      const planTier = config.planId.replace("_blueprint", "");
+
+      console.log("Generating PDF with config:", {
+        freshAnalysisId,
+        planTier,
+        addOns: config.selectedAddOns,
+      });
+
+      const response = await fetch("/api/wellness/purchase", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          analysisId: freshAnalysisId,
+          planTier,
+          addOns: config.selectedAddOns,
+          quizData: savedQuizData ? JSON.parse(savedQuizData) : undefined,
+        }),
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to generate PDF");
+        const errorText = await response.text();
+        console.error("Purchase API error:", response.status, errorText);
+        try {
+          const errorData = JSON.parse(errorText);
+          throw new Error(
+            errorData.message || `Purchase failed: ${response.status}`,
+          );
+        } catch (e) {
+          throw new Error(
+            `Purchase failed: ${response.status} ${response.statusText}`,
+          );
+        }
       }
 
       const data = await response.json();
+      console.log("PDF generation successful:", data);
 
-      if (!data.pdfUrl) {
-        throw new Error("No PDF URL received");
+      const plan = getProductByPlanId(config.planId);
+      const addOnPages = config.selectedAddOns.reduce((sum, id) => {
+        const addon = getAddOnById(id);
+        return sum + (addon?.pageCountAddition || 0);
+      }, 0);
+      const totalPages = (plan?.pageCount || 6) + addOnPages;
+
+      setPdfData({
+        pdfRecordId: data.pdfRecordId,
+        orderId: data.orderId,
+        planTier: config.planId,
+        userName: quizData.userName || "User",
+        generatedAt: new Date().toISOString(),
+        expiresAt: new Date(
+          Date.now() + 30 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
+        downloadUrl: data.downloadUrl,
+        pageCount: totalPages,
+      });
+
+      localStorage.setItem("lastPDFData", JSON.stringify(data));
+    } catch (err) {
+      console.error("PDF generation error:", err);
+      setError(err instanceof Error ? err.message : "Failed to generate PDF");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!pdfData) return;
+
+    setIsDownloading(true);
+    try {
+      console.log("Starting download from URL:", pdfData.downloadUrl);
+      const response = await fetch(pdfData.downloadUrl);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(
+          `Download failed: ${response.status} ${response.statusText}`,
+          errorText,
+        );
+        throw new Error(
+          `Download failed: ${response.status} ${response.statusText}`,
+        );
       }
 
-      // Convert base64 data URL to blob and download
-      const arr = data.pdfUrl.split(",");
-      const mime = arr[0].match(/:(.*?);/)?.[1] || "application/pdf";
-      const bstr = atob(arr[1]);
-      const n = bstr.length;
-      const u8arr = new Uint8Array(n);
+      const blob = await response.blob();
+      console.log("PDF blob size:", blob.size);
 
-      for (let i = 0; i < n; i++) {
-        u8arr[i] = bstr.charCodeAt(i);
+      if (blob.size === 0) {
+        throw new Error("Downloaded PDF is empty");
       }
 
-      const blob = new Blob([u8arr], { type: mime });
-      const url = URL.createObjectURL(blob);
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = data.filename || `${selectedProduct.name}.pdf`;
+      link.download = `${quizData.userName || "blueprint"}_${pdfData.planTier}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      window.URL.revokeObjectURL(url);
 
-      // Track download
-      localStorage.setItem(
-        "downloadHistory",
-        JSON.stringify([
-          ...(JSON.parse(localStorage.getItem("downloadHistory") || "[]") ||
-            []),
-          {
-            productId: selectedProduct.id,
-            productName: selectedProduct.name,
-            timestamp: new Date().toISOString(),
-            filename: data.filename,
-          },
-        ])
+      console.log("Download completed successfully");
+    } catch (err) {
+      console.error("Download error:", err);
+      setError(
+        err instanceof Error
+          ? `Download failed: ${err.message}`
+          : "Failed to download PDF",
       );
-    } catch (e) {
-      console.error("Download error:", e);
-      setError("Failed to download your blueprint. Please try again.");
     } finally {
-      setDownloadStarted(false);
+      setIsDownloading(false);
     }
   };
 
-  const handleShareOnSocial = () => {
-    const shareText = `I just got my personalized Wellness Blueprint from Genewell! 🧬 It includes my custom nutrition plan, fitness routine, and stress management strategy. Check it out! 💪`;
-    const shareUrl = window.location.origin;
+  const handleViewInline = async () => {
+    if (!pdfData) return;
 
-    // Open share dialog
-    if (navigator.share) {
-      navigator.share({
-        title: "Genewell - Personalized Wellness Blueprint",
-        text: shareText,
-        url: shareUrl,
-      });
-    } else {
-      // Fallback: open social media shares
-      const links = {
-        twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
-        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
-        whatsapp: `https://wa.me/?text=${encodeURIComponent(shareText + " " + shareUrl)}`,
-        linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
-      };
-
-      // Create a simple share menu
-      const choice = confirm(
-        "Choose platform:\nOK = Twitter, Cancel = Copy Link"
+    try {
+      const response = await fetch(
+        `/api/wellness/download-pdf-base64/${pdfData.pdfRecordId}`,
       );
-      if (choice) {
-        window.open(links.twitter, "_blank");
-      } else {
-        navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
-        alert("Link copied to clipboard!");
+      if (!response.ok) throw new Error("Failed to load PDF");
+
+      const data = await response.json();
+      const newWindow = window.open();
+      if (newWindow) {
+        newWindow.document.write(
+          `<iframe src="${data.pdfUrl}" style="width:100%;height:100%;border:none;" />`,
+        );
       }
+    } catch (err) {
+      console.error("View error:", err);
+      setError("Failed to view PDF");
     }
   };
 
-  const handleTellAFriend = () => {
-    const message = `Hey! I just discovered Genewell, an amazing AI-powered wellness platform that creates personalized health blueprints. Get your own in just 3 minutes!\n\nCheck it out: ${window.location.origin}`;
-
-    if (navigator.share) {
-      navigator.share({
-        title: "Genewell - Personalized Health Blueprint",
-        text: message,
-      });
-    } else {
-      // Open email
-      window.location.href = `mailto:?subject=You should check out Genewell!&body=${encodeURIComponent(message)}`;
-    }
-  };
-
-  const handleGiftBlueprint = () => {
-    const message = `I'd like to gift you a Genewell Wellness Blueprint! It's a personalized guide that includes nutrition, fitness, sleep, and stress management recommendations.\n\nVisit: ${window.location.origin}`;
-
-    window.location.href = `mailto:?subject=I'm Gifting You a Wellness Blueprint from Genewell&body=${encodeURIComponent(message)}`;
-  };
-
-  const handleContactSupport = () => {
-    const subject = "Genewell Support - Wellness Blueprint Assistance";
-    const body = `Hi Genewell Team,\n\nI need assistance with my wellness blueprint.\n\nAnalysis ID: ${purchaseData?.analysisId || "N/A"}\n\nPlease help me with:\n`;
-
-    window.location.href = `mailto:support@genewell.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  };
-
-  if (!purchaseData || !selectedProduct) {
+  if (!analysisId) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="text-center">
-          <Sparkles className="h-16 w-16 text-purple-500 mx-auto mb-4 animate-spin" />
-          <h2 className="text-xl font-semibold text-gray-900">Loading...</h2>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-8 text-center">
+            <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">
+              Quiz Required
+            </h1>
+            <p className="text-slate-600 mb-6">
+              Your wellness blueprint is personalized based on your quiz
+              responses. Please complete the wellness quiz first to get started.
+            </p>
+            <Button
+              onClick={() => navigate("/quiz")}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+            >
+              Take Wellness Quiz
+            </Button>
+            <p className="text-xs text-slate-500 mt-4">
+              Takes about 5-10 minutes to complete
+            </p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md text-center p-8">
+          <Loader className="h-12 w-12 text-blue-600 mx-auto mb-4 animate-spin" />
+          <h2 className="text-xl font-bold text-slate-900 mb-2">
+            Generating Your Blueprint
+          </h2>
+          <p className="text-slate-600">
+            Personalizing your wellness plan with your quiz data...
+          </p>
+        </Card>
+      </div>
+    );
+  }
+
+  const plan = getProductByPlanId(configuration?.planId || "free_blueprint");
+  const selectedAddOns =
+    configuration?.selectedAddOns
+      .map((id) => getAddOnById(id))
+      .filter(Boolean) || [];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col">
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center space-x-3">
-              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl">
-                <CheckCircle className="h-6 w-6 text-white" />
+            <Link to="/" className="flex items-center space-x-2">
+              <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg">
+                <Sparkles className="h-5 w-5 text-white" />
               </div>
-              <div>
-                <span className="font-bold text-xl bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
-                  Genewell
-                </span>
-                <div className="text-xs text-gray-500 font-medium">
-                  WELLNESS AI
-                </div>
-              </div>
+              <span className="font-bold text-lg text-blue-900">Genewell</span>
             </Link>
-            <div className="flex items-center space-x-4">
-              <Badge className="bg-green-100 text-green-700">
-                ✅ Payment Successful
-              </Badge>
-              <Button variant="ghost" onClick={handleBack}>
-                <ArrowLeft className="mr-2 h-4 w-4" /> Back
-              </Button>
-            </div>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/quiz")}>
+              <ArrowLeft className="mr-2 h-4 w-4" /> Take Another Quiz
+            </Button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Success Message */}
-        <div className="text-center mb-12">
-          <div className="w-24 h-24 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
-            <CheckCircle className="h-12 w-12 text-white" />
+      {/* Main Content */}
+      <div className="flex-1 py-12">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Success Header */}
+          <div className="text-center mb-8">
+            <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
+            <h1 className="text-4xl font-bold text-slate-900 mb-2">
+              Your Download is Ready, {quizData.userName || "User"}!
+            </h1>
+            <p className="text-xl text-slate-600">
+              Your personalized wellness blueprint has been generated
+            </p>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            🎉 Download Ready!
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-6">
-            Your personalized <strong>{selectedProduct.name}</strong> guide is
-            ready to download. Get instant access to science-backed insights
-            tailored just for you.
-          </p>
-          <Badge className="bg-gradient-to-r from-emerald-500 to-green-500 text-white px-4 py-2 text-lg">
-            ₹{selectedProduct.price} - Instant Download ✨
-          </Badge>
-        </div>
 
-        {/* Download Section */}
-        <Card className="border-2 border-emerald-200 shadow-2xl bg-white/90 backdrop-blur-sm mb-12">
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold text-gray-900 flex items-center justify-center space-x-3">
-              <FileText className="h-8 w-8 text-emerald-600" />
-              <span>Your Wellness Blueprint</span>
-            </CardTitle>
-            <CardDescription className="text-lg">
-              Download your complete personalized health transformation guide
-            </CardDescription>
-          </CardHeader>
+          {error && (
+            <Alert className="mb-6 border-red-200 bg-red-50">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="text-red-700 ml-2">
+                {error}
+              </AlertDescription>
+            </Alert>
+          )}
 
-          <CardContent className="space-y-6">
-            {/* Key Insights Preview */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-purple-50 rounded-xl p-4 text-center">
-                <Brain className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                <h3 className="font-semibold text-gray-900 text-sm">
-                  Metabolism
-                </h3>
-                <p className="text-xs text-gray-600">Balanced Type</p>
-              </div>
-              <div className="bg-pink-50 rounded-xl p-4 text-center">
-                <Heart className="h-8 w-8 text-pink-600 mx-auto mb-2" />
-                <h3 className="font-semibold text-gray-900 text-sm">
-                  Nutrition
-                </h3>
-                <p className="text-xs text-gray-600">Custom Meal Plan</p>
-              </div>
-              <div className="bg-orange-50 rounded-xl p-4 text-center">
-                <Target className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-                <h3 className="font-semibold text-gray-900 text-sm">Fitness</h3>
-                <p className="text-xs text-gray-600">Home Workouts</p>
-              </div>
-              <div className="bg-emerald-50 rounded-xl p-4 text-center">
-                <Clock className="h-8 w-8 text-emerald-600 mx-auto mb-2" />
-                <h3 className="font-semibold text-gray-900 text-sm">Timing</h3>
-                <p className="text-xs text-gray-600">Optimal Schedule</p>
-              </div>
-            </div>
+          {/* Configuration Summary */}
+          {plan && (
+            <Card className="mb-6 border-2 border-green-200 bg-green-50/30">
+              <CardHeader>
+                <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                <CardDescription>
+                  Complete · {pdfData?.pageCount || plan.pageCount} pages
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-slate-900 mb-3">
+                      Your Blueprint Includes:
+                    </h3>
+                    <ul className="space-y-2">
+                      {plan.details.map((feature, idx) => (
+                        <li
+                          key={idx}
+                          className="flex items-start space-x-2 text-slate-700"
+                        >
+                          <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
-            {/* Download PDF */}
-            <div className="space-y-4">
-              {error && (
-                <Alert className="border-red-200 bg-red-50">
-                  <AlertCircle className="h-4 w-4 text-red-600" />
-                  <AlertDescription className="text-red-700">
-                    {error}
-                  </AlertDescription>
-                </Alert>
-              )}
+                  {selectedAddOns.length > 0 && (
+                    <div className="border-t border-green-200 pt-4">
+                      <h3 className="font-semibold text-slate-900 mb-3">
+                        Premium Add-Ons Included:
+                      </h3>
+                      <div className="space-y-2">
+                        {selectedAddOns.map((addon) => (
+                          <div
+                            key={addon!.id}
+                            className="flex items-start space-x-2 bg-white/60 p-3 rounded-lg border border-green-100"
+                          >
+                            <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                            <div className="flex-1">
+                              <p className="font-semibold text-slate-900">
+                                {addon!.name}
+                              </p>
+                              <p className="text-xs text-slate-600 mt-1">
+                                +{addon!.pageCountAddition} pages
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-              <div className="text-center">
-                <Button
-                  onClick={handleDownload}
-                  disabled={downloadStarted}
-                  className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-6 text-lg font-semibold rounded-2xl shadow-xl"
-                  size="lg"
-                >
-                  <DownloadIcon className="mr-3 h-6 w-6" />
-                  {downloadStarted
-                    ? "Generating PDF..."
-                    : "📥 Download PDF Blueprint"}
-                </Button>
-              </div>
-
-              <p className="text-center text-sm text-gray-600">
-                Your personalized wellness guide will open in a new window
-              </p>
-            </div>
-
-            {/* Email Delivery Info */}
-            <div className="bg-blue-50 rounded-xl p-6 text-center">
-              <Mail className="h-8 w-8 text-blue-600 mx-auto mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">
-                📧 Email Delivery
-              </h3>
-              <p className="text-gray-600 text-sm">
-                We've also sent a copy to <strong>{purchaseData.email}</strong>
-                <br />
-                Check your inbox (and spam folder) for your wellness blueprint!
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* What's Inside */}
-        <div className="mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">
-            What's Inside Your Blueprint 📋
-          </h2>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-6">
-                <h3 className="font-bold text-gray-900 mb-4 flex items-center">
-                  <Heart className="h-5 w-5 text-red-500 mr-2" />
-                  Personalized Nutrition Plan
-                </h3>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li>✅ Best foods for your metabolism type</li>
-                  <li>✅ Foods to avoid based on your sensitivities</li>
-                  <li>✅ Optimal meal timing schedule</li>
-                  <li>✅ Portion size recommendations</li>
-                  <li>✅ 7-day meal prep guide</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-6">
-                <h3 className="font-bold text-gray-900 mb-4 flex items-center">
-                  <Target className="h-5 w-5 text-orange-500 mr-2" />
-                  Custom Fitness Routine
-                </h3>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li>✅ Home-friendly workout plans</li>
-                  <li>✅ Exercise frequency & intensity</li>
-                  <li>✅ Recovery recommendations</li>
-                  <li>✅ Progressive difficulty levels</li>
-                  <li>✅ Weekly exercise calendar</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-6">
-                <h3 className="font-bold text-gray-900 mb-4 flex items-center">
-                  <Brain className="h-5 w-5 text-purple-500 mr-2" />
-                  Lifestyle Optimization
-                </h3>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li>✅ Sleep optimization strategies</li>
-                  <li>✅ Stress management techniques</li>
-                  <li>✅ Daily routine planner</li>
-                  <li>✅ Habit formation guide</li>
-                  <li>✅ Progress tracking tools</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-6">
-                <h3 className="font-bold text-gray-900 mb-4 flex items-center">
-                  <Sparkles className="h-5 w-5 text-emerald-500 mr-2" />
-                  Supplement & Wellness
-                </h3>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li>✅ Personalized supplement stack</li>
-                  <li>✅ Dosage & timing instructions</li>
-                  <li>✅ Natural alternatives</li>
-                  <li>✅ Hydration guidelines</li>
-                  <li>✅ Wellness tracking metrics</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Next Steps */}
-        <Card className="border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-gray-900">
-              🚀 Your Transformation Starts Now!
-            </CardTitle>
-            <CardDescription className="text-lg">
-              Here's how to get the best results from your blueprint
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-6 text-center">
-              <div>
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <span className="text-purple-600 font-bold text-xl">1</span>
+                  {pdfData && (
+                    <div className="border-t border-green-200 pt-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white/60 p-3 rounded-lg">
+                          <p className="text-xs text-slate-600">Total Pages</p>
+                          <p className="text-2xl font-bold text-green-600">
+                            {pdfData.pageCount}
+                          </p>
+                        </div>
+                        <div className="bg-white/60 p-3 rounded-lg">
+                          <p className="text-xs text-slate-600">Generated</p>
+                          <p className="text-xs text-slate-900 mt-1">
+                            {new Date(pdfData.generatedAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2">
-                  Review Your Plan
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Read through your complete blueprint and understand your
-                  unique recommendations
-                </p>
-              </div>
-              <div>
-                <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <span className="text-pink-600 font-bold text-xl">2</span>
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">
-                  Start Gradually
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Implement 2-3 changes per week for sustainable long-term
-                  results
-                </p>
-              </div>
-              <div>
-                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <span className="text-orange-600 font-bold text-xl">3</span>
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">
-                  Track Progress
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Use the tracking tools provided to monitor your transformation
-                  journey
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          )}
 
-        {/* Social Sharing */}
-        <div className="text-center mt-12 p-8 bg-gradient-to-r from-pink-50 to-purple-50 rounded-2xl">
-          <h3 className="text-xl font-bold text-gray-900 mb-6">
-            Love your results? Share with friends! 💚
-          </h3>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button
-              onClick={handleShareOnSocial}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
-            >
-              <Share2 className="mr-2 h-4 w-4" />
-              Share on Social Media
-            </Button>
-            <Button
-              onClick={handleTellAFriend}
-              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
-            >
-              <MessageCircle className="mr-2 h-4 w-4" />
-              Tell a Friend
-            </Button>
-            <Button
-              onClick={handleGiftBlueprint}
-              className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
-            >
-              <Gift className="mr-2 h-4 w-4" />
-              Gift a Blueprint
-            </Button>
-          </div>
-        </div>
+          {/* Download Buttons */}
+          {pdfData && (
+            <Card className="mb-6 border-2 border-blue-500">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50">
+                <CardTitle>Download Your Blueprint</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="space-y-3">
+                  <Button
+                    onClick={handleDownload}
+                    disabled={isDownloading}
+                    size="lg"
+                    className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:opacity-90 text-white font-semibold py-6 text-lg"
+                  >
+                    {isDownloading ? (
+                      <>
+                        <Loader className="mr-2 h-5 w-5 animate-spin" />
+                        Downloading...
+                      </>
+                    ) : (
+                      <>
+                        <DownloadIcon className="mr-2 h-5 w-5" />
+                        Download PDF ({pdfData.pageCount} pages)
+                      </>
+                    )}
+                  </Button>
 
-        {/* Support */}
-        <div className="text-center mt-8 p-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl border border-blue-100">
-          <h3 className="font-semibold text-gray-900 mb-2">
-            📞 Need Help Getting Started?
-          </h3>
-          <p className="text-gray-600 text-sm mb-6">
-            Our wellness experts are here to support your transformation journey
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-3">
-            <Button
-              onClick={handleContactSupport}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              <Mail className="mr-2 h-4 w-4" />
-              Email Support
-            </Button>
-            <Button
-              variant="outline"
-              className="border-blue-300 text-blue-600 hover:bg-blue-50"
-              onClick={() => window.location.href = "tel:8009785785"}
-            >
-              <Phone className="mr-2 h-4 w-4" />
-              Call 8009785785
-            </Button>
+                  <Button
+                    onClick={handleViewInline}
+                    variant="outline"
+                    size="lg"
+                    className="w-full py-6 text-base"
+                  >
+                    <FileText className="mr-2 h-5 w-5" />
+                    View Online
+                  </Button>
+                </div>
+
+                {pdfData.expiresAt && (
+                  <div className="mt-4 text-xs text-slate-500 text-center">
+                    Your download expires on{" "}
+                    {new Date(pdfData.expiresAt).toLocaleDateString()}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Next Steps */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">What's Next?</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-start space-x-4">
+                <Badge className="mt-1 flex-shrink-0">1</Badge>
+                <div>
+                  <h4 className="font-semibold text-slate-900">
+                    Download your blueprint
+                  </h4>
+                  <p className="text-sm text-slate-600 mt-1">
+                    Save the PDF to your device. It includes everything
+                    personalized to your profile.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4">
+                <Badge className="mt-1 flex-shrink-0">2</Badge>
+                <div>
+                  <h4 className="font-semibold text-slate-900">
+                    Review and understand your plan
+                  </h4>
+                  <p className="text-sm text-slate-600 mt-1">
+                    Read through your personalized recommendations. They're
+                    based on your quiz answers and science-backed research.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4">
+                <Badge className="mt-1 flex-shrink-0">3</Badge>
+                <div>
+                  <h4 className="font-semibold text-slate-900">
+                    Start implementing
+                  </h4>
+                  <p className="text-sm text-slate-600 mt-1">
+                    Begin with the simple actions in Week 1. Consistency beats
+                    perfection.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4">
+                <Badge className="mt-1 flex-shrink-0">4</Badge>
+                <div>
+                  <h4 className="font-semibold text-slate-900">
+                    Track and adjust
+                  </h4>
+                  <p className="text-sm text-slate-600 mt-1">
+                    Use the tracking tools in your blueprint. After 4 weeks,
+                    reassess and adjust based on what's working.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Support */}
+          <div className="mt-8 text-center p-6 bg-white rounded-lg border border-slate-200">
+            <h3 className="font-semibold text-slate-900 mb-2">Need Help?</h3>
+            <p className="text-slate-600 text-sm mb-4">
+              Have questions about your plan or need additional support?
+            </p>
+            <a href="mailto:support@genewell.com">
+              <Button variant="outline">
+                <Mail className="mr-2 h-4 w-4" />
+                Contact Support
+              </Button>
+            </a>
           </div>
         </div>
       </div>
 
-      {/* Footer with Legal Links */}
+      {/* Footer */}
       <LegalFooter />
     </div>
   );

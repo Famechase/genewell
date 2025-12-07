@@ -45,7 +45,6 @@ export const WellnessQuizSchema = z.object({
     "moderately-active",
     "highly-active",
   ]),
-  bodyType: z.enum(["ectomorph", "mesomorph", "endomorph", "not-sure"]),
   cravings: z.enum([
     "sweet-foods",
     "salty-snacks",
@@ -234,7 +233,7 @@ export const WellnessBlueprintSchema = z.object({
     imbalances: z.array(z.string()),
     recommendations: z.array(z.string()),
     seasonalTips: z.array(z.string()),
-  }),
+  }).optional(),
 
   confidenceScore: z.number().min(0).max(100),
   generatedAt: z.string(),
