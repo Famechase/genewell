@@ -180,17 +180,20 @@ export default function Download() {
           <CardContent className="p-8 text-center">
             <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-slate-900 mb-2">
-              No Quiz Found
+              Quiz Required
             </h1>
             <p className="text-slate-600 mb-6">
-              Please complete the wellness quiz first
+              Your wellness blueprint is personalized based on your quiz responses. Please complete the wellness quiz first to get started.
             </p>
             <Button
               onClick={() => navigate("/quiz")}
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
             >
-              Start Quiz
+              Take Wellness Quiz
             </Button>
+            <p className="text-xs text-slate-500 mt-4">
+              Takes about 5-10 minutes to complete
+            </p>
           </CardContent>
         </Card>
       </div>
