@@ -199,7 +199,9 @@ export const handlePDFDownload: RequestHandler = async (req, res) => {
     const pdfRecord = getPDFRecord(pdfRecordId);
     if (!pdfRecord) {
       console.error(`PDF record not found: ${pdfRecordId}`);
-      console.log(`Available PDF records: ${Array.from((STORAGE.pdfRecords || new Map()).keys()).join(", ")}`);
+      console.log(
+        `Available PDF records: ${Array.from((STORAGE.pdfRecords || new Map()).keys()).join(", ")}`,
+      );
       return res.status(404).json({
         success: false,
         message: "PDF not found",
@@ -216,7 +218,9 @@ export const handlePDFDownload: RequestHandler = async (req, res) => {
       });
     }
 
-    console.log(`Sending PDF: ${pdfRecord.filename}, size: ${buffer.length} bytes`);
+    console.log(
+      `Sending PDF: ${pdfRecord.filename}, size: ${buffer.length} bytes`,
+    );
 
     // Send as download
     res.setHeader("Content-Type", "application/pdf");

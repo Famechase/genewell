@@ -100,7 +100,11 @@ export default function Download() {
       // Convert plan ID to tier name (remove "_blueprint" suffix)
       const planTier = config.planId.replace("_blueprint", "");
 
-      console.log("Generating PDF with config:", { freshAnalysisId, planTier, addOns: config.selectedAddOns });
+      console.log("Generating PDF with config:", {
+        freshAnalysisId,
+        planTier,
+        addOns: config.selectedAddOns,
+      });
 
       const response = await fetch("/api/wellness/purchase", {
         method: "POST",
@@ -118,9 +122,13 @@ export default function Download() {
         console.error("Purchase API error:", response.status, errorText);
         try {
           const errorData = JSON.parse(errorText);
-          throw new Error(errorData.message || `Purchase failed: ${response.status}`);
+          throw new Error(
+            errorData.message || `Purchase failed: ${response.status}`,
+          );
         } catch (e) {
-          throw new Error(`Purchase failed: ${response.status} ${response.statusText}`);
+          throw new Error(
+            `Purchase failed: ${response.status} ${response.statusText}`,
+          );
         }
       }
 
@@ -166,8 +174,13 @@ export default function Download() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`Download failed: ${response.status} ${response.statusText}`, errorText);
-        throw new Error(`Download failed: ${response.status} ${response.statusText}`);
+        console.error(
+          `Download failed: ${response.status} ${response.statusText}`,
+          errorText,
+        );
+        throw new Error(
+          `Download failed: ${response.status} ${response.statusText}`,
+        );
       }
 
       const blob = await response.blob();
@@ -192,7 +205,7 @@ export default function Download() {
       setError(
         err instanceof Error
           ? `Download failed: ${err.message}`
-          : "Failed to download PDF"
+          : "Failed to download PDF",
       );
     } finally {
       setIsDownloading(false);
