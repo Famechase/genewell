@@ -46,7 +46,6 @@ export default function Download() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState("");
 
-  const analysisId = localStorage.getItem("analysisId");
   const quizData = JSON.parse(localStorage.getItem("quizData") || "{}");
 
   // Get configuration from state or localStorage
@@ -55,6 +54,8 @@ export default function Download() {
   );
 
   useEffect(() => {
+    const currentAnalysisId = localStorage.getItem("analysisId");
+
     const stateConfig = location.state?.configuration || location.state?.planId
       ? {
           planId: location.state?.planId || location.state?.configuration?.planId,
@@ -65,10 +66,14 @@ export default function Download() {
 
     setConfiguration(stateConfig);
 
-    if (stateConfig && analysisId) {
+    if (stateConfig && currentAnalysisId) {
       generatePDF(stateConfig);
+    } else if (stateConfig && !currentAnalysisId) {
+      // Configuration exists but no analysis ID
+      setError("Please complete the quiz first to generate your personalized blueprint.");
+      setIsLoading(false);
     }
-  }, [analysisId, location.state]);
+  }, [location.state]);
 
   const generatePDF = async (config: PlanConfiguration) => {
     setIsLoading(true);
