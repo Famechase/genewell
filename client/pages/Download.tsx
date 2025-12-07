@@ -80,7 +80,10 @@ export default function Download() {
     setError("");
 
     try {
-      if (!analysisId) {
+      // Read analysisId fresh from localStorage to avoid stale values
+      const freshAnalysisId = localStorage.getItem("analysisId");
+
+      if (!freshAnalysisId) {
         throw new Error("Analysis ID not found. Please complete the quiz first.");
       }
 
@@ -91,7 +94,7 @@ export default function Download() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          analysisId,
+          analysisId: freshAnalysisId,
           planTier,
           addOns: config.selectedAddOns,
         }),
