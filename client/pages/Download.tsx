@@ -82,6 +82,7 @@ export default function Download() {
     try {
       // Read analysisId fresh from localStorage to avoid stale values
       const freshAnalysisId = localStorage.getItem("analysisId");
+      const savedQuizData = localStorage.getItem("quizData");
 
       if (!freshAnalysisId) {
         throw new Error("Analysis ID not found. Please complete the quiz first.");
@@ -97,6 +98,7 @@ export default function Download() {
           analysisId: freshAnalysisId,
           planTier,
           addOns: config.selectedAddOns,
+          quizData: savedQuizData ? JSON.parse(savedQuizData) : undefined,
         }),
       });
 
