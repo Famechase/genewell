@@ -152,10 +152,22 @@ export default function Download() {
 
     setIsDownloading(true);
     try {
+      console.log("Starting download from URL:", pdfData.downloadUrl);
       const response = await fetch(pdfData.downloadUrl);
-      if (!response.ok) throw new Error("Download failed");
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Download failed: ${response.status} ${response.statusText}`, errorText);
+        throw new Error(`Download failed: ${response.status} ${response.statusText}`);
+      }
 
       const blob = await response.blob();
+      console.log("PDF blob size:", blob.size);
+
+      if (blob.size === 0) {
+        throw new Error("Downloaded PDF is empty");
+      }
+
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -164,9 +176,15 @@ export default function Download() {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+
+      console.log("Download completed successfully");
     } catch (err) {
       console.error("Download error:", err);
-      setError("Failed to download PDF");
+      setError(
+        err instanceof Error
+          ? `Download failed: ${err.message}`
+          : "Failed to download PDF"
+      );
     } finally {
       setIsDownloading(false);
     }
