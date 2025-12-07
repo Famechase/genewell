@@ -100,6 +100,8 @@ export default function Download() {
       // Convert plan ID to tier name (remove "_blueprint" suffix)
       const planTier = config.planId.replace("_blueprint", "");
 
+      console.log("Generating PDF with config:", { freshAnalysisId, planTier, addOns: config.selectedAddOns });
+
       const response = await fetch("/api/wellness/purchase", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -112,11 +114,18 @@ export default function Download() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to generate PDF");
+        const errorText = await response.text();
+        console.error("Purchase API error:", response.status, errorText);
+        try {
+          const errorData = JSON.parse(errorText);
+          throw new Error(errorData.message || `Purchase failed: ${response.status}`);
+        } catch (e) {
+          throw new Error(`Purchase failed: ${response.status} ${response.statusText}`);
+        }
       }
 
       const data = await response.json();
+      console.log("PDF generation successful:", data);
 
       const plan = getProductByPlanId(config.planId);
       const addOnPages = config.selectedAddOns.reduce((sum, id) => {
