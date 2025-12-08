@@ -239,7 +239,7 @@ export default function Index() {
                   Smart Quiz
                 </CardTitle>
                 <CardDescription className="text-gray-600 text-lg">
-                  Answer 17 science-backed questions about your body, habits,
+                  Answer 25 science-backed questions about your body, habits,
                   and goals
                 </CardDescription>
               </CardHeader>
