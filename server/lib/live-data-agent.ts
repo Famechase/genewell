@@ -12,13 +12,18 @@ export interface LiveDataInsight {
 }
 
 // Cache for live data (in production, use Redis or similar)
-const liveDataCache: Map<string, { data: LiveDataInsight[]; timestamp: number }> = new Map();
+const liveDataCache: Map<
+  string,
+  { data: LiveDataInsight[]; timestamp: number }
+> = new Map();
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
  * Fetches trending health research topics from various sources
  */
-export async function fetchLiveHealthResearch(topic: string): Promise<LiveDataInsight[]> {
+export async function fetchLiveHealthResearch(
+  topic: string,
+): Promise<LiveDataInsight[]> {
   const cacheKey = `research_${topic}`;
   const cached = liveDataCache.get(cacheKey);
 
@@ -91,7 +96,7 @@ export async function fetchLiveHealthResearch(topic: string): Promise<LiveDataIn
  * Personalizes recommendations based on live data and user profile
  */
 export async function generateLivePersonalizedInsights(
-  profile: UserProfile
+  profile: UserProfile,
 ): Promise<Map<string, string>> {
   const personalizedInsights = new Map<string, string>();
 
@@ -106,7 +111,7 @@ export async function generateLivePersonalizedInsights(
     if (sleepResearch.length > 0) {
       personalizedInsights.set(
         "sleep_live",
-        `${sleepResearch[0].content} For you specifically: Based on your current sleep of ${profile.sleepHours || 7} hours, focus on consistency rather than increasing duration if you're already in the 6-8 hour range.`
+        `${sleepResearch[0].content} For you specifically: Based on your current sleep of ${profile.sleepHours || 7} hours, focus on consistency rather than increasing duration if you're already in the 6-8 hour range.`,
       );
     }
 
@@ -114,7 +119,7 @@ export async function generateLivePersonalizedInsights(
     if (nutritionResearch.length > 0 && profile.goal?.includes("weight")) {
       personalizedInsights.set(
         "nutrition_live",
-        `${nutritionResearch[0].content} For your weight management goal: Adopt Mediterranean diet principles with your Indian cuisine preferences.`
+        `${nutritionResearch[0].content} For your weight management goal: Adopt Mediterranean diet principles with your Indian cuisine preferences.`,
       );
     }
 
@@ -122,15 +127,19 @@ export async function generateLivePersonalizedInsights(
     if (exerciseResearch.length > 0 && profile.activityLevel) {
       personalizedInsights.set(
         "exercise_live",
-        `${exerciseResearch[0].content} For your ${profile.activityLevel} activity level: Incorporate 2-3 sessions of Zone 2 work (maintain ability to have conversation) each week.`
+        `${exerciseResearch[0].content} For your ${profile.activityLevel} activity level: Incorporate 2-3 sessions of Zone 2 work (maintain ability to have conversation) each week.`,
       );
     }
 
     // Mental health
-    if (mentalHealthResearch.length > 0 && profile.stressScore && profile.stressScore > 5) {
+    if (
+      mentalHealthResearch.length > 0 &&
+      profile.stressScore &&
+      profile.stressScore > 5
+    ) {
       personalizedInsights.set(
         "stress_live",
-        `${mentalHealthResearch[0].content} Given your stress level of ${profile.stressScore}/10, try starting with 15-20 second cold exposure.`
+        `${mentalHealthResearch[0].content} Given your stress level of ${profile.stressScore}/10, try starting with 15-20 second cold exposure.`,
       );
     }
 
@@ -145,7 +154,7 @@ export async function generateLivePersonalizedInsights(
  * Fetches location-specific health recommendations
  */
 export async function getLocationSpecificRecommendations(
-  location?: string
+  location?: string,
 ): Promise<string[]> {
   const recommendations: string[] = [];
 
@@ -169,7 +178,7 @@ export async function getLocationSpecificRecommendations(
  * Generates unique supplement recommendations based on live research
  */
 export async function generateLiveSupplementRecommendations(
-  profile: UserProfile
+  profile: UserProfile,
 ): Promise<string[]> {
   const supplements: string[] = [];
 
@@ -197,12 +206,14 @@ export async function generateLiveSupplementRecommendations(
     // Unique scientific findings (2024)
     if (profile.exercisePreference === "cardio") {
       supplements.push(
-        "Beet Juice Extract: 500mg (NO boost for cardiovascular performance)"
+        "Beet Juice Extract: 500mg (NO boost for cardiovascular performance)",
       );
     }
 
     if (profile.gender === "female" && profile.age >= 30) {
-      supplements.push("Iron: Monitor levels (especially if menstruating heavily)");
+      supplements.push(
+        "Iron: Monitor levels (especially if menstruating heavily)",
+      );
       supplements.push("NAC: 600-1200mg (hormone balance & antioxidant)");
     }
 
@@ -230,12 +241,12 @@ export function getLiveNutrientOptimizerPairing(goal: string): string[] {
       "Beef + red peppers + garlic (iron + vitamin C + antibacterial)",
       "Paneer + spinach (calcium + iron + complete protein)",
     ],
-    "energy": [
+    energy: [
       "Oats + banana + almonds (sustained energy release)",
       "Dates + peanut butter + cocoa (quick + sustained energy)",
       "Sweet potato + eggs + olive oil (glucose + protein + micronutrients)",
     ],
-    "longevity": [
+    longevity: [
       "Olive oil + tomatoes + garlic (Mediterranean staple)",
       "Blueberries + nuts + dark chocolate (polyphenol cocktail)",
       "Leafy greens + legumes + whole grains (nutrient density)",
@@ -250,33 +261,42 @@ export function getLiveNutrientOptimizerPairing(goal: string): string[] {
  */
 export async function generateLiveMealPrepPlan(
   days: number = 7,
-  cuisine: string = "indian"
+  cuisine: string = "indian",
 ): Promise<Record<string, string>> {
   const mealPlan: Record<string, string> = {};
 
   const recipes = {
     indian: {
-      "Monday": "Grilled chicken tikka + brown rice + raita",
-      "Tuesday": "Moong dal + roti + mixed vegetables",
-      "Wednesday": "Paneer bhurji + oats + green salad",
-      "Thursday": "Fish curry (light) + quinoa + cucumber salad",
-      "Friday": "Chickpea curry + whole wheat roti + spinach",
-      "Saturday": "Egg fried rice + broccoli + soy sauce (light)",
-      "Sunday": "Dal makhani (light) + roti + green salad",
+      Monday: "Grilled chicken tikka + brown rice + raita",
+      Tuesday: "Moong dal + roti + mixed vegetables",
+      Wednesday: "Paneer bhurji + oats + green salad",
+      Thursday: "Fish curry (light) + quinoa + cucumber salad",
+      Friday: "Chickpea curry + whole wheat roti + spinach",
+      Saturday: "Egg fried rice + broccoli + soy sauce (light)",
+      Sunday: "Dal makhani (light) + roti + green salad",
     },
     mediterranean: {
-      "Monday": "Grilled salmon + farro + roasted vegetables",
-      "Tuesday": "Lentil soup + whole grain bread + olive oil",
-      "Wednesday": "Herb-roasted chicken + sweet potato + arugula",
-      "Thursday": "Falafel + hummus + whole wheat pita + Greek salad",
-      "Friday": "Baked white fish + brown rice + seasonal vegetables",
-      "Saturday": "Pasta primavera + whole grain pasta + parmesan",
-      "Sunday": "Vegetable stew + legumes + olive oil + herbs",
+      Monday: "Grilled salmon + farro + roasted vegetables",
+      Tuesday: "Lentil soup + whole grain bread + olive oil",
+      Wednesday: "Herb-roasted chicken + sweet potato + arugula",
+      Thursday: "Falafel + hummus + whole wheat pita + Greek salad",
+      Friday: "Baked white fish + brown rice + seasonal vegetables",
+      Saturday: "Pasta primavera + whole grain pasta + parmesan",
+      Sunday: "Vegetable stew + legumes + olive oil + herbs",
     },
   };
 
-  const cuisineRecipes = recipes[cuisine as keyof typeof recipes] || recipes.mediterranean;
-  const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const cuisineRecipes =
+    recipes[cuisine as keyof typeof recipes] || recipes.mediterranean;
+  const dayNames = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
 
   for (let i = 0; i < Math.min(days, 7); i++) {
     mealPlan[dayNames[i]] = cuisineRecipes[dayNames[i]];

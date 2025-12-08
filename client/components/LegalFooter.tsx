@@ -166,10 +166,15 @@ export default function LegalFooter() {
   const renderModal = (key: keyof typeof legalContent) => {
     const content = legalContent[key];
     return (
-      <Dialog open={openModal === key} onOpenChange={(open) => !open && setOpenModal(null)}>
+      <Dialog
+        open={openModal === key}
+        onOpenChange={(open) => !open && setOpenModal(null)}
+      >
         <DialogContent className="max-h-[80vh] overflow-y-auto max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">{content.title}</DialogTitle>
+            <DialogTitle className="text-2xl font-bold">
+              {content.title}
+            </DialogTitle>
             {"lastUpdated" in content && (
               <DialogDescription className="text-xs mt-1">
                 Last updated: {content.lastUpdated}
@@ -180,7 +185,9 @@ export default function LegalFooter() {
           <div className="space-y-6 py-4">
             {content.sections.map((section, idx) => (
               <div key={idx}>
-                <h3 className="font-bold text-gray-900 mb-2">{section.heading}</h3>
+                <h3 className="font-bold text-gray-900 mb-2">
+                  {section.heading}
+                </h3>
                 <p className="text-sm text-gray-600 leading-relaxed">
                   {section.content}
                 </p>
@@ -193,7 +200,11 @@ export default function LegalFooter() {
           </div>
 
           <DialogClose asChild>
-            <Button variant="ghost" size="sm" className="absolute right-4 top-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute right-4 top-4"
+            >
               <X className="h-4 w-4" />
             </Button>
           </DialogClose>
@@ -233,13 +244,19 @@ export default function LegalFooter() {
               <ul className="space-y-2 text-sm text-gray-400">
                 <li className="flex items-center space-x-2">
                   <span>📞</span>
-                  <a href="tel:8009785785" className="hover:text-white transition">
+                  <a
+                    href="tel:8009785785"
+                    className="hover:text-white transition"
+                  >
                     8009785785
                   </a>
                 </li>
                 <li className="flex items-center space-x-2">
                   <span>📧</span>
-                  <a href="mailto:support@genewell.com" className="hover:text-white transition">
+                  <a
+                    href="mailto:support@genewell.com"
+                    className="hover:text-white transition"
+                  >
                     support@genewell.com
                   </a>
                 </li>
@@ -254,7 +271,10 @@ export default function LegalFooter() {
               <h4 className="font-bold mb-4">Wellness Programs</h4>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li>
-                  <a href="#genetic-wellness" className="hover:text-white transition">
+                  <a
+                    href="#genetic-wellness"
+                    className="hover:text-white transition"
+                  >
                     Genetic Analysis
                   </a>
                 </li>
@@ -274,17 +294,32 @@ export default function LegalFooter() {
               <h4 className="font-bold mb-4">Connect With Us</h4>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li>
-                  <a href="https://instagram.com" className="hover:text-white transition" target="_blank" rel="noopener noreferrer">
+                  <a
+                    href="https://instagram.com"
+                    className="hover:text-white transition"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Instagram
                   </a>
                 </li>
                 <li>
-                  <a href="https://linkedin.com" className="hover:text-white transition" target="_blank" rel="noopener noreferrer">
+                  <a
+                    href="https://linkedin.com"
+                    className="hover:text-white transition"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     LinkedIn
                   </a>
                 </li>
                 <li>
-                  <a href="https://twitter.com" className="hover:text-white transition" target="_blank" rel="noopener noreferrer">
+                  <a
+                    href="https://twitter.com"
+                    className="hover:text-white transition"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Twitter/X
                   </a>
                 </li>
@@ -328,8 +363,8 @@ export default function LegalFooter() {
             <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
               <ShieldAlert className="h-3 w-3" />
               <span>
-                All data encrypted with 256-bit SSL. Compliant with GDPR, CCPA, and
-                HIPAA standards.
+                All data encrypted with 256-bit SSL. Compliant with GDPR, CCPA,
+                and HIPAA standards.
               </span>
             </div>
           </div>

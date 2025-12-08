@@ -22,7 +22,7 @@ interface PDFChunks {
 
 export async function generatePersonalizedPDF(
   personalizationData: PersonalizationData,
-  options: PDFGenerationOptions
+  options: PDFGenerationOptions,
 ): Promise<PDFChunks> {
   const { profile, insights } = personalizationData;
   const { tier, addOns = [], orderId, timestamp } = options;
@@ -53,7 +53,10 @@ export async function generatePersonalizedPDF(
     if (subtitle) {
       doc.fontSize(12).font("Helvetica").fillColor("#718096").text(subtitle);
     }
-    doc.moveTo(40, doc.y).lineTo(doc.page.width - 40, doc.y).stroke("#e5e7eb");
+    doc
+      .moveTo(40, doc.y)
+      .lineTo(doc.page.width - 40, doc.y)
+      .stroke("#e5e7eb");
     doc.moveDown(0.5);
   };
 
@@ -89,7 +92,7 @@ export async function generatePersonalizedPDF(
     premium: "Premium Edition",
     coaching: "Complete Coaching Edition",
   };
-  
+
   doc
     .fontSize(16)
     .font("Helvetica")
@@ -102,11 +105,11 @@ export async function generatePersonalizedPDF(
     .font("Helvetica")
     .fillColor("#718096")
     .text(
-      `Generated: ${new Date(timestamp).toLocaleDateString()} at ${new Date(timestamp).toLocaleTimeString()}`
+      `Generated: ${new Date(timestamp).toLocaleDateString()} at ${new Date(timestamp).toLocaleTimeString()}`,
     );
   doc.text(`Order ID: ${orderId}`);
   doc.text(`Plan Tier: ${tier.toUpperCase()}`);
-  
+
   doc.moveDown(0.5);
   doc
     .fontSize(11)
@@ -114,7 +117,7 @@ export async function generatePersonalizedPDF(
     .fillColor("#111827")
     .text(`Age: ${profile.age} | Gender: ${profile.gender}`);
   doc.text(
-    `Height: ${profile.estimatedHeightCm}cm | Weight: ${profile.estimatedWeightKg}kg`
+    `Height: ${profile.estimatedHeightCm}cm | Weight: ${profile.estimatedWeightKg}kg`,
   );
 
   doc.moveDown(2);
@@ -123,16 +126,13 @@ export async function generatePersonalizedPDF(
     .font("Helvetica")
     .fillColor("#111827")
     .text(
-      `Dear ${profile.name},\n\nThis personalized wellness blueprint is uniquely designed for you, based on your quiz answers, lifestyle, and goals. Every recommendation is science-backed and actionable.\n\nFollow the daily and weekly steps consistently, and you'll see measurable improvements within 30 days.`
+      `Dear ${profile.name},\n\nThis personalized wellness blueprint is uniquely designed for you, based on your quiz answers, lifestyle, and goals. Every recommendation is science-backed and actionable.\n\nFollow the daily and weekly steps consistently, and you'll see measurable improvements within 30 days.`,
     );
 
   doc.addPage();
 
   // === PAGE 1: EXECUTIVE SUMMARY ===
-  addHeaderSection(
-    "Executive Summary",
-    `Your Personalized Wellness Analysis`
-  );
+  addHeaderSection("Executive Summary", `Your Personalized Wellness Analysis`);
 
   doc.moveDown(0.3);
   doc.fontSize(11).font("Helvetica").fillColor("#111827");
@@ -161,31 +161,31 @@ export async function generatePersonalizedPDF(
   if (tier === "premium" || tier === "coaching") {
     addHeaderSection(
       "Latest Science Updates",
-      "Real-time health insights based on 2024 research"
+      "Real-time health insights based on 2024 research",
     );
 
     doc.fontSize(10).font("Helvetica").fillColor("#111827");
     doc.text(
-      "Your personalized plan incorporates the latest wellness research from 2024. These insights are unique to your profile and goals."
+      "Your personalized plan incorporates the latest wellness research from 2024. These insights are unique to your profile and goals.",
     );
     doc.moveDown(0.3);
 
     addSubSection("Your Personalized Research Insights");
     doc.fontSize(9).fillColor("#111827");
     doc.text(
-      "Sleep: Recent studies confirm that sleep consistency matters more than duration. Your target is to wake at the same time daily, including weekends."
+      "Sleep: Recent studies confirm that sleep consistency matters more than duration. Your target is to wake at the same time daily, including weekends.",
     );
     doc.moveDown(0.1);
     doc.text(
-      "Nutrition: 2024 research shows Mediterranean diet principles dramatically improve longevity. We've adapted this to your Indian diet preferences."
+      "Nutrition: 2024 research shows Mediterranean diet principles dramatically improve longevity. We've adapted this to your Indian diet preferences.",
     );
     doc.moveDown(0.1);
     doc.text(
-      "Exercise: Zone 2 training (conversational pace cardio) is proven to enhance aerobic capacity without overtraining. Aim for 2-3 sessions weekly."
+      "Exercise: Zone 2 training (conversational pace cardio) is proven to enhance aerobic capacity without overtraining. Aim for 2-3 sessions weekly.",
     );
     doc.moveDown(0.1);
     doc.text(
-      "Stress: Cold exposure (15-30 seconds) activates your vagus nerve and improves resilience. Start conservative if new to cold."
+      "Stress: Cold exposure (15-30 seconds) activates your vagus nerve and improves resilience. Start conservative if new to cold.",
     );
     doc.moveDown(0.3);
 
@@ -202,25 +202,29 @@ export async function generatePersonalizedPDF(
   if (tier !== "free") {
     addHeaderSection(
       "Your Metabolic Profile",
-      `${profile.name}'s Personal Energy Calculation`
+      `${profile.name}'s Personal Energy Calculation`,
     );
 
     doc.fontSize(11).font("Helvetica").fillColor("#111827");
     doc.moveDown(0.3);
 
-    doc.text("Based on your age, gender, activity level, and body composition:");
+    doc.text(
+      "Based on your age, gender, activity level, and body composition:",
+    );
     doc.moveDown(0.2);
 
     doc.text(
-      `Basal Metabolic Rate (BMR): ${profile.estimatedBMR} calories/day`
+      `Basal Metabolic Rate (BMR): ${profile.estimatedBMR} calories/day`,
     );
     doc.fontSize(9).fillColor("#6b7280");
-    doc.text("Energy your body burns at complete rest (breathing, circulation, brain).");
+    doc.text(
+      "Energy your body burns at complete rest (breathing, circulation, brain).",
+    );
     doc.moveDown(0.1);
 
     doc.fontSize(11).fillColor("#111827");
     doc.text(
-      `Total Daily Energy Expenditure (TDEE): ${profile.estimatedTDEE} calories/day`
+      `Total Daily Energy Expenditure (TDEE): ${profile.estimatedTDEE} calories/day`,
     );
     doc.fontSize(9).fillColor("#6b7280");
     doc.text("Your actual daily calorie burn, including activity.");
@@ -230,25 +234,25 @@ export async function generatePersonalizedPDF(
     addSubSection("What This Means for Weight Management");
     doc.fontSize(10);
     doc.text(
-      `→ To maintain weight: Eat ~${profile.estimatedTDEE} calories daily`
+      `→ To maintain weight: Eat ~${profile.estimatedTDEE} calories daily`,
     );
     doc.text(
-      `→ To lose fat: Eat ${profile.estimatedTDEE - 300} - ${profile.estimatedTDEE - 500} calories/day`
+      `→ To lose fat: Eat ${profile.estimatedTDEE - 300} - ${profile.estimatedTDEE - 500} calories/day`,
     );
     doc.text(
-      `→ To gain muscle: Eat ${profile.estimatedTDEE + 300} - ${profile.estimatedTDEE + 500} calories/day`
+      `→ To gain muscle: Eat ${profile.estimatedTDEE + 300} - ${profile.estimatedTDEE + 500} calories/day`,
     );
 
     doc.moveDown(0.3);
     addSubSection("Daily Macronutrient Targets");
     const proteinPct = Math.round(
-      (profile.proteinGrams * 4) / profile.estimatedTDEE * 100
+      ((profile.proteinGrams * 4) / profile.estimatedTDEE) * 100,
     );
     const carbsPct = Math.round(
-      (profile.carbsGrams * 4) / profile.estimatedTDEE * 100
+      ((profile.carbsGrams * 4) / profile.estimatedTDEE) * 100,
     );
     const fatsPct = Math.round(
-      (profile.fatsGrams * 9) / profile.estimatedTDEE * 100
+      ((profile.fatsGrams * 9) / profile.estimatedTDEE) * 100,
     );
 
     doc.fontSize(10);
@@ -256,7 +260,7 @@ export async function generatePersonalizedPDF(
     doc.fontSize(9).fillColor("#6b7280");
     doc.text(
       "For muscle preservation and satiety. 1.8-2.2g per kg body weight is optimal.",
-      { indent: 20 }
+      { indent: 20 },
     );
     doc.moveDown(0.1);
 
@@ -265,17 +269,16 @@ export async function generatePersonalizedPDF(
     doc.fontSize(9).fillColor("#6b7280");
     doc.text(
       "Fuels workouts, brain, and recovery. Timing matters (pre/post-workout).",
-      { indent: 20 }
+      { indent: 20 },
     );
     doc.moveDown(0.1);
 
     doc.fontSize(10).fillColor("#111827");
     doc.text(`Fats: ${profile.fatsGrams}g/day (${fatsPct}%)`);
     doc.fontSize(9).fillColor("#6b7280");
-    doc.text(
-      "Essential for hormones, brain, and nutrient absorption.",
-      { indent: 20 }
-    );
+    doc.text("Essential for hormones, brain, and nutrient absorption.", {
+      indent: 20,
+    });
 
     doc.addPage();
   }
@@ -284,7 +287,7 @@ export async function generatePersonalizedPDF(
   if (tier === "essential" || tier === "premium" || tier === "coaching") {
     addHeaderSection(
       "Personalized Nutrition Plan",
-      `${profile.name}'s Optimal Eating Strategy`
+      `${profile.name}'s Optimal Eating Strategy`,
     );
 
     addSubSection("Your Meal Timing (Circadian Optimization)");
@@ -296,13 +299,15 @@ export async function generatePersonalizedPDF(
     doc.moveDown(0.2);
     doc.fontSize(9).fillColor("#6b7280");
     doc.text(
-      "Research shows eating within consistent windows synchronizes your circadian rhythm, improves digestion, and stabilizes blood sugar."
+      "Research shows eating within consistent windows synchronizes your circadian rhythm, improves digestion, and stabilizes blood sugar.",
     );
 
     doc.moveDown(0.3);
     addSubSection("Core Nutrition Framework (Every Meal)");
     doc.fontSize(10).fillColor("#111827");
-    addBulletPoint("Protein source (eggs, Greek yogurt, paneer, dal, chicken, tofu)");
+    addBulletPoint(
+      "Protein source (eggs, Greek yogurt, paneer, dal, chicken, tofu)",
+    );
     addBulletPoint("Carb source (rice, roti, oats, sweet potato, quinoa)");
     addBulletPoint("Vegetable (minimum 2 cups, variety of colors)");
     addBulletPoint("Healthy fat (olive oil, ghee, nuts, avocado)");
@@ -313,7 +318,7 @@ export async function generatePersonalizedPDF(
       addSubSection("7-Day Meal Plan Framework");
       doc.fontSize(10).font("Helvetica").fillColor("#111827");
       doc.text(
-        "Use this as a template. Mix and match based on your preferences:"
+        "Use this as a template. Mix and match based on your preferences:",
       );
       doc.moveDown(0.2);
 
@@ -335,11 +340,9 @@ export async function generatePersonalizedPDF(
       doc.fontSize(9).font("Helvetica").fillColor("#111827");
       doc.text("Proteins: Chicken breast, Fish, Paneer, Moong/Arhar dal, Eggs");
       doc.text(
-        "Vegetables: Spinach, Broccoli, Bell peppers, Carrots, Cauliflower, Tomatoes"
+        "Vegetables: Spinach, Broccoli, Bell peppers, Carrots, Cauliflower, Tomatoes",
       );
-      doc.text(
-        "Grains: Brown rice, Whole wheat roti, Oats, Quinoa, Millets"
-      );
+      doc.text("Grains: Brown rice, Whole wheat roti, Oats, Quinoa, Millets");
       doc.text("Healthy Fats: Olive oil, Ghee, Almonds, Peanuts, Sesame oil");
 
       doc.moveDown(0.3);
@@ -348,8 +351,12 @@ export async function generatePersonalizedPDF(
       addBulletPoint("Upon waking: 500ml water (rehydrates after 8-hour fast)");
       addBulletPoint("With meals: 250ml water (aids digestion)");
       addBulletPoint("Between meals: Drink when thirsty");
-      addBulletPoint("Daily target: 2-2.5 liters (adjust for climate, activity)");
-      addBulletPoint("After 7 PM: Reduce intake (minimize nighttime urination)");
+      addBulletPoint(
+        "Daily target: 2-2.5 liters (adjust for climate, activity)",
+      );
+      addBulletPoint(
+        "After 7 PM: Reduce intake (minimize nighttime urination)",
+      );
 
       doc.addPage();
     }
@@ -358,7 +365,7 @@ export async function generatePersonalizedPDF(
   // === SLEEP OPTIMIZATION (All tiers) ===
   addHeaderSection(
     "Sleep Optimization Protocol",
-    `${profile.name}'s Critical Recovery Foundation`
+    `${profile.name}'s Critical Recovery Foundation`,
   );
 
   doc.fontSize(10).font("Helvetica").fillColor("#111827");
@@ -384,7 +391,7 @@ export async function generatePersonalizedPDF(
     doc.moveDown(0.2);
     doc.fontSize(9).fillColor("#6b7280");
     doc.text(
-      "→ Try protocol first for 2 weeks minimum. Then add one supplement at a time."
+      "→ Try protocol first for 2 weeks minimum. Then add one supplement at a time.",
     );
   }
 
@@ -394,7 +401,7 @@ export async function generatePersonalizedPDF(
   if (tier === "essential" || tier === "premium" || tier === "coaching") {
     addHeaderSection(
       "Movement & Training Plan",
-      `${profile.name}'s Personalized Exercise Protocol`
+      `${profile.name}'s Personalized Exercise Protocol`,
     );
 
     doc.fontSize(10).font("Helvetica").fillColor("#111827");
@@ -405,8 +412,8 @@ export async function generatePersonalizedPDF(
       tier === "essential"
         ? "3-Day Beginner"
         : tier === "premium"
-        ? "5-Day Intermediate"
-        : "6-Day Advanced";
+          ? "5-Day Intermediate"
+          : "6-Day Advanced";
 
     addSubSection(`${workoutType} Weekly Schedule`);
     doc.fontSize(10);
@@ -448,7 +455,9 @@ export async function generatePersonalizedPDF(
       doc.text("Sat-Sun: Optional light activity or complete rest");
     } else {
       doc.text("6-day periodized program with progressive overload");
-      doc.text("Phases: Strength (weeks 1-4) → Hypertrophy (weeks 5-8) → Power (weeks 9-12)");
+      doc.text(
+        "Phases: Strength (weeks 1-4) → Hypertrophy (weeks 5-8) → Power (weeks 9-12)",
+      );
     }
 
     doc.moveDown(0.3);
@@ -464,7 +473,7 @@ export async function generatePersonalizedPDF(
   // === STRESS MANAGEMENT ===
   addHeaderSection(
     "Stress Management & Nervous System Optimization",
-    `${profile.name}'s Daily Resilience Protocol`
+    `${profile.name}'s Daily Resilience Protocol`,
   );
 
   doc.fontSize(10).font("Helvetica").fillColor("#111827");
@@ -474,24 +483,28 @@ export async function generatePersonalizedPDF(
   addSubSection("Daily Stress Management Tools");
   doc.fontSize(10);
   addBulletPoint(
-    "Box Breathing: 4-4-4-4 count. Activates parasympathetic in 5 minutes."
+    "Box Breathing: 4-4-4-4 count. Activates parasympathetic in 5 minutes.",
   );
   addBulletPoint(
-    "Movement: 20-30 min moderate activity (walk, yoga, gym). Reduces cortisol comparable to medication."
+    "Movement: 20-30 min moderate activity (walk, yoga, gym). Reduces cortisol comparable to medication.",
   );
-  addBulletPoint(
-    "Social connection: 30+ min meaningful interaction 3x/week."
-  );
+  addBulletPoint("Social connection: 30+ min meaningful interaction 3x/week.");
   addBulletPoint("Fix sleep first: One bad night increases anxiety by 60%.");
 
   if (tier !== "free") {
     doc.moveDown(0.3);
     addSubSection("Advanced Stress Techniques");
     doc.fontSize(10);
-    addBulletPoint("Progressive Muscle Relaxation: Tense & release each muscle group");
+    addBulletPoint(
+      "Progressive Muscle Relaxation: Tense & release each muscle group",
+    );
     addBulletPoint("Meditation: 10-15 min daily (Headspace, Calm, or free YT)");
-    addBulletPoint("Nature exposure: 20+ min in nature (park, forest) 1-2x/week");
-    addBulletPoint("Creative hobbies: Art, music, or writing (activate parasympathetic)");
+    addBulletPoint(
+      "Nature exposure: 20+ min in nature (park, forest) 1-2x/week",
+    );
+    addBulletPoint(
+      "Creative hobbies: Art, music, or writing (activate parasympathetic)",
+    );
   }
 
   doc.addPage();
@@ -500,7 +513,7 @@ export async function generatePersonalizedPDF(
   if (tier === "premium" || tier === "coaching") {
     addHeaderSection(
       "Smart Supplement Strategy",
-      `${profile.name}'s Science-Backed Nutritional Support`
+      `${profile.name}'s Science-Backed Nutritional Support`,
     );
 
     doc.fontSize(10).font("Helvetica").fillColor("#111827");
@@ -524,8 +537,12 @@ export async function generatePersonalizedPDF(
     addSubSection("Supplement Selection Rules");
     doc.fontSize(9);
     doc.text("1. Start ONE supplement at a time (2-week minimum)");
-    doc.text("2. Buy from reputable brands: USP, NSF, Informed Choice certified");
-    doc.text("3. Food first — supplements fill gaps, not replace real nutrition");
+    doc.text(
+      "2. Buy from reputable brands: USP, NSF, Informed Choice certified",
+    );
+    doc.text(
+      "3. Food first — supplements fill gaps, not replace real nutrition",
+    );
     doc.text("4. Consult doctor before starting anything");
     doc.text("5. Store in cool, dry place away from sunlight");
 
@@ -535,7 +552,7 @@ export async function generatePersonalizedPDF(
   // === PROGRESS TRACKING ===
   addHeaderSection(
     "90-Day Progress Tracking System",
-    `${profile.name}'s Transformation Timeline`
+    `${profile.name}'s Transformation Timeline`,
   );
 
   doc.fontSize(10).font("Helvetica").fillColor("#111827");
@@ -551,9 +568,7 @@ export async function generatePersonalizedPDF(
   addSubSection("Monthly Assessment (Week 4, 8, 12)");
   doc.fontSize(10);
   addBulletPoint("Photos: Same time, same place, same light (front & side)");
-  addBulletPoint(
-    "Measurements: Weight, waist, chest, arms (if applicable)"
-  );
+  addBulletPoint("Measurements: Weight, waist, chest, arms (if applicable)");
   addBulletPoint("Performance: Push-ups, squats, running time, etc.");
   addBulletPoint("Blood work: If doing 6 & 12 week testing");
   addBulletPoint("Mood & energy consistency");
@@ -570,13 +585,20 @@ export async function generatePersonalizedPDF(
 
   // === ADD-ONS ===
   if (addOns.length > 0) {
-    addHeaderSection("Premium Add-On Content", `${profile.name}'s Enhanced Analysis`);
+    addHeaderSection(
+      "Premium Add-On Content",
+      `${profile.name}'s Enhanced Analysis`,
+    );
 
     if (addOns.includes("addon_dna")) {
-      doc.fontSize(12).font("Helvetica-Bold").fillColor("#7c3aed").text("1. DNA Analysis Insights");
+      doc
+        .fontSize(12)
+        .font("Helvetica-Bold")
+        .fillColor("#7c3aed")
+        .text("1. DNA Analysis Insights");
       doc.fontSize(10).font("Helvetica").fillColor("#111827");
       doc.text(
-        "Your genetic profile reveals key optimization opportunities across nutrition, training, and supplementation."
+        "Your genetic profile reveals key optimization opportunities across nutrition, training, and supplementation.",
       );
       doc.moveDown(0.3);
 
@@ -584,52 +606,74 @@ export async function generatePersonalizedPDF(
       doc.fontSize(9).fillColor("#111827");
       doc.text(
         "Your variant affects hunger hormone sensitivity. If you carry risk alleles:",
-        { indent: 20 }
+        { indent: 20 },
       );
       doc.text("→ Use smaller plates and meal prep portions", { indent: 20 });
-      doc.text("→ Eat more protein (25-30% of calories) for satiety", { indent: 20 });
+      doc.text("→ Eat more protein (25-30% of calories) for satiety", {
+        indent: 20,
+      });
       doc.text("→ Avoid eating directly from bags/boxes", { indent: 20 });
       doc.moveDown(0.2);
 
       doc.text("CYP1A2 Gene (rs762551) - Caffeine Metabolism");
-      doc.text(
-        "Determines if you're a fast or slow caffeine metabolizer:",
-        { indent: 20 }
-      );
-      doc.text("→ Fast: Can drink coffee until 4 PM without sleep disruption", { indent: 20 });
-      doc.text("→ Slow: Limit caffeine to morning only, max 100-200mg", { indent: 20 });
+      doc.text("Determines if you're a fast or slow caffeine metabolizer:", {
+        indent: 20,
+      });
+      doc.text("→ Fast: Can drink coffee until 4 PM without sleep disruption", {
+        indent: 20,
+      });
+      doc.text("→ Slow: Limit caffeine to morning only, max 100-200mg", {
+        indent: 20,
+      });
       doc.moveDown(0.2);
 
       doc.text("ACTN3 Gene (rs1815439) - Muscle Fiber Type & Performance");
+      doc.text("Influences your natural athletic response pattern:", {
+        indent: 20,
+      });
       doc.text(
-        "Influences your natural athletic response pattern:",
-        { indent: 20 }
+        "→ RR variant: Better for endurance (prioritize aerobic training)",
+        { indent: 20 },
       );
-      doc.text("→ RR variant: Better for endurance (prioritize aerobic training)", { indent: 20 });
-      doc.text("→ XX variant: Better for strength (prioritize resistance training)", { indent: 20 });
+      doc.text(
+        "→ XX variant: Better for strength (prioritize resistance training)",
+        { indent: 20 },
+      );
       doc.moveDown(0.2);
 
       doc.text("MTHFR Gene (C677T) - Folate & Methylation");
-      doc.text("Affects how efficiently you process B vitamins:", { indent: 20 });
+      doc.text("Affects how efficiently you process B vitamins:", {
+        indent: 20,
+      });
       doc.text("→ Take methylfolate (not folic acid)", { indent: 20 });
       doc.text("→ Supplement with methylcobalamin (B12)", { indent: 20 });
       doc.moveDown(0.3);
 
       doc.fontSize(8).fillColor("#6b7280");
-      doc.text("Note: Genes provide 20% of the equation. Environment and behavior control 80%.");
+      doc.text(
+        "Note: Genes provide 20% of the equation. Environment and behavior control 80%.",
+      );
 
       doc.addPage();
     }
 
     if (addOns.includes("addon_supplement")) {
-      doc.fontSize(12).font("Helvetica-Bold").fillColor("#7c3aed").text("2. 12-Week Supplement Protocol");
+      doc
+        .fontSize(12)
+        .font("Helvetica-Bold")
+        .fillColor("#7c3aed")
+        .text("2. 12-Week Supplement Protocol");
       doc.fontSize(10).font("Helvetica").fillColor("#111827");
       doc.text(
-        "A periodized, evidence-based supplement strategy based on your quiz data and goals."
+        "A periodized, evidence-based supplement strategy based on your quiz data and goals.",
       );
       doc.moveDown(0.3);
 
-      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Phase 1: Loading (Weeks 1-4)");
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#4a5568")
+        .text("Phase 1: Loading (Weeks 1-4)");
       doc.fontSize(9).fillColor("#111827");
       doc.text("Foundation building — establish consistent supplementation:");
       addBulletPoint("Vitamin D3: 4000 IU daily (morning)", 20);
@@ -640,15 +684,26 @@ export async function generatePersonalizedPDF(
       doc.text("Goal: Establish baseline, test tolerance, build habit");
 
       doc.moveDown(0.2);
-      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Phase 2: Optimization (Weeks 5-8)");
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#4a5568")
+        .text("Phase 2: Optimization (Weeks 5-8)");
       doc.fontSize(9).fillColor("#111827");
       doc.text("Add performance-specific supplements:");
-      addBulletPoint("Add Creatine Monohydrate: 5g daily (if training hard)", 20);
+      addBulletPoint(
+        "Add Creatine Monohydrate: 5g daily (if training hard)",
+        20,
+      );
       addBulletPoint("Add Zinc: 25-30mg with dinner (recovery, hormones)", 20);
       addBulletPoint("L-Theanine: 100-200mg as needed for stress", 20);
 
       doc.moveDown(0.2);
-      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Phase 3: Refinement (Weeks 9-12)");
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#4a5568")
+        .text("Phase 3: Refinement (Weeks 9-12)");
       doc.fontSize(9).fillColor("#111827");
       doc.text("Assess what works, drop what doesn't:");
       addBulletPoint("Keep: What improved energy, sleep, or performance", 20);
@@ -656,7 +711,11 @@ export async function generatePersonalizedPDF(
       addBulletPoint("Retest: Blood work (repeat 6-week tests)", 20);
 
       doc.moveDown(0.3);
-      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Brand Recommendations");
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#4a5568")
+        .text("Brand Recommendations");
       doc.fontSize(9).fillColor("#111827");
       doc.text("Verified brands with 3rd-party testing (USP/NSF):");
       doc.text("• Vitamin D3: Pure Encapsulations, NOW Foods, iHerb");
@@ -668,133 +727,244 @@ export async function generatePersonalizedPDF(
     }
 
     if (addOns.includes("addon_athlete")) {
-      doc.fontSize(12).font("Helvetica-Bold").fillColor("#7c3aed").text("3. Athletic Performance Add-On");
+      doc
+        .fontSize(12)
+        .font("Helvetica-Bold")
+        .fillColor("#7c3aed")
+        .text("3. Athletic Performance Add-On");
       doc.fontSize(10).font("Helvetica").fillColor("#111827");
       doc.text(
-        "Sport-specific training, energy system development, and competition fuel strategy."
+        "Sport-specific training, energy system development, and competition fuel strategy.",
       );
       doc.moveDown(0.3);
 
-      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("12-Week Periodization");
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#4a5568")
+        .text("12-Week Periodization");
       doc.fontSize(9).fillColor("#111827");
       doc.text("Weeks 1-4: Base Building");
-      doc.text("  5-6 training days/week, moderate intensity (70% max effort)", { indent: 10 });
+      doc.text(
+        "  5-6 training days/week, moderate intensity (70% max effort)",
+        { indent: 10 },
+      );
       doc.text("  Focus: Aerobic base, technique refinement", { indent: 10 });
       doc.moveDown(0.1);
 
       doc.text("Weeks 5-8: Intensity Addition");
-      doc.text(
-        "  2-3 high-intensity interval sessions + 3 moderate sessions",
-        { indent: 10 }
-      );
+      doc.text("  2-3 high-intensity interval sessions + 3 moderate sessions", {
+        indent: 10,
+      });
       doc.text("  Focus: VO2max, lactate threshold, power", { indent: 10 });
       doc.moveDown(0.1);
 
       doc.text("Weeks 9-12: Competition Preparation");
       doc.text(
         "  Sport-specific skills, competition simulation, peak tapering",
-        { indent: 10 }
+        { indent: 10 },
       );
-      doc.text("  Focus: Race-specific pacing, mental preparation", { indent: 10 });
+      doc.text("  Focus: Race-specific pacing, mental preparation", {
+        indent: 10,
+      });
 
       doc.moveDown(0.3);
-      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Fueling Strategy");
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#4a5568")
+        .text("Fueling Strategy");
       doc.fontSize(9).fillColor("#111827");
       doc.text("Before training (1-2 hours before):");
-      doc.text("  Carbs + small protein: banana + almonds or toast + peanut butter", { indent: 10 });
+      doc.text(
+        "  Carbs + small protein: banana + almonds or toast + peanut butter",
+        { indent: 10 },
+      );
       doc.moveDown(0.1);
 
       doc.text("During training (if >90 min):");
       doc.text("  Sports drink: 30-60g carbs/hour", { indent: 10 });
-      doc.text("  Electrolytes: 500-700mg sodium for sweat loss", { indent: 10 });
+      doc.text("  Electrolytes: 500-700mg sodium for sweat loss", {
+        indent: 10,
+      });
       doc.moveDown(0.1);
 
       doc.text("After training (within 30 min):");
-      doc.text("  Protein + carbs: 20-40g protein + 1-1.2g/kg carbs", { indent: 10 });
+      doc.text("  Protein + carbs: 20-40g protein + 1-1.2g/kg carbs", {
+        indent: 10,
+      });
 
       doc.addPage();
     }
 
     if (addOns.includes("addon_family")) {
-      doc.fontSize(12).font("Helvetica-Bold").fillColor("#7c3aed").text("4. Family Nutrition Plan");
+      doc
+        .fontSize(12)
+        .font("Helvetica-Bold")
+        .fillColor("#7c3aed")
+        .text("4. Family Nutrition Plan");
       doc.fontSize(10).font("Helvetica").fillColor("#111827");
       doc.text(
-        "This add-on customizes meal plans for up to 4 family members while keeping grocery shopping efficient."
+        "This add-on customizes meal plans for up to 4 family members while keeping grocery shopping efficient.",
       );
       doc.moveDown(0.3);
 
-      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("How This Works");
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#4a5568")
+        .text("How This Works");
       doc.fontSize(9).fillColor("#111827");
       doc.text("Each family member gets their own custom plan based on:");
-      doc.text("  • Age, gender, health status, and fitness level", { indent: 10 });
+      doc.text("  • Age, gender, health status, and fitness level", {
+        indent: 10,
+      });
       doc.text("  • Dietary preferences and restrictions", { indent: 10 });
       doc.text("  • Personal health goals", { indent: 10 });
       doc.moveDown(0.2);
 
       doc.text("Shared family benefits:");
-      doc.text("  • One master grocery list (everyone's needs combined)", { indent: 10 });
+      doc.text("  • One master grocery list (everyone's needs combined)", {
+        indent: 10,
+      });
       doc.text("  • Recipes with portions for each member", { indent: 10 });
-      doc.text("  • Efficiency: Cook once, serve personalized portions", { indent: 10 });
+      doc.text("  • Efficiency: Cook once, serve personalized portions", {
+        indent: 10,
+      });
 
       doc.addPage();
     }
 
     if (addOns.includes("addon_women_hormone")) {
-      doc.fontSize(12).font("Helvetica-Bold").fillColor("#7c3aed").text("5. Women's Hormonal Health");
+      doc
+        .fontSize(12)
+        .font("Helvetica-Bold")
+        .fillColor("#7c3aed")
+        .text("5. Women's Hormonal Health");
       doc.fontSize(10).font("Helvetica").fillColor("#111827");
-      doc.text("Menstrual cycle-synced nutrition, PCOS/thyroid support, and cycle-aware training.");
+      doc.text(
+        "Menstrual cycle-synced nutrition, PCOS/thyroid support, and cycle-aware training.",
+      );
       doc.moveDown(0.3);
 
-      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Follicular Phase (Days 1-14)");
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#4a5568")
+        .text("Follicular Phase (Days 1-14)");
       doc.fontSize(9).fillColor("#111827");
       doc.text("Higher estrogen = Better carb tolerance");
-      doc.text("Nutrition: Higher carbs (50% of calories), moderate protein/fat", { indent: 10 });
-      doc.text("Training: Best time for strength & high-intensity workouts", { indent: 10 });
+      doc.text(
+        "Nutrition: Higher carbs (50% of calories), moderate protein/fat",
+        { indent: 10 },
+      );
+      doc.text("Training: Best time for strength & high-intensity workouts", {
+        indent: 10,
+      });
       doc.moveDown(0.2);
 
-      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Luteal Phase (Days 15-28)");
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#4a5568")
+        .text("Luteal Phase (Days 15-28)");
       doc.fontSize(9).fillColor("#111827");
-      doc.text("Higher progesterone = Reduced carb tolerance, higher calorie needs");
-      doc.text("Nutrition: Higher fat (30-35%), moderate carbs, higher protein", { indent: 10 });
-      doc.text("Training: Lower intensity, recovery-focused (yoga, walks)", { indent: 10 });
+      doc.text(
+        "Higher progesterone = Reduced carb tolerance, higher calorie needs",
+      );
+      doc.text(
+        "Nutrition: Higher fat (30-35%), moderate carbs, higher protein",
+        { indent: 10 },
+      );
+      doc.text("Training: Lower intensity, recovery-focused (yoga, walks)", {
+        indent: 10,
+      });
       doc.moveDown(0.2);
 
-      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Women-Specific Supplements");
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#4a5568")
+        .text("Women-Specific Supplements");
       doc.fontSize(9).fillColor("#111827");
-      doc.text("Iron: Monitor after menstruation (especially if heavy flow)", { indent: 10 });
-      doc.text("Magnesium: 400mg/day, especially luteal phase for PMS", { indent: 10 });
-      doc.text("B vitamins: Energy and mood, especially B6 & B12", { indent: 10 });
-      doc.text("Omega-3: 2-3g/day for hormone balance and inflammation", { indent: 10 });
+      doc.text("Iron: Monitor after menstruation (especially if heavy flow)", {
+        indent: 10,
+      });
+      doc.text("Magnesium: 400mg/day, especially luteal phase for PMS", {
+        indent: 10,
+      });
+      doc.text("B vitamins: Energy and mood, especially B6 & B12", {
+        indent: 10,
+      });
+      doc.text("Omega-3: 2-3g/day for hormone balance and inflammation", {
+        indent: 10,
+      });
 
       doc.addPage();
     }
 
     if (addOns.includes("addon_men_fitness")) {
-      doc.fontSize(12).font("Helvetica-Bold").fillColor("#7c3aed").text("6. Men's Fitness Optimization");
+      doc
+        .fontSize(12)
+        .font("Helvetica-Bold")
+        .fillColor("#7c3aed")
+        .text("6. Men's Fitness Optimization");
       doc.fontSize(10).font("Helvetica").fillColor("#111827");
-      doc.text("Testosterone optimization, muscle-building framework, and strength progression.");
+      doc.text(
+        "Testosterone optimization, muscle-building framework, and strength progression.",
+      );
       doc.moveDown(0.3);
 
-      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Testosterone Optimization");
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#4a5568")
+        .text("Testosterone Optimization");
       doc.fontSize(9).fillColor("#111827");
-      doc.text("Heavy resistance training: 3-6x/week with compound lifts", { indent: 10 });
-      doc.text("Sleep: 7-9 hours (testosterone production happens at night)", { indent: 10 });
-      doc.text("Zinc: 15-30mg daily (supports testosterone production)", { indent: 10 });
-      doc.text("Stress management: Chronic cortisol suppresses testosterone", { indent: 10 });
+      doc.text("Heavy resistance training: 3-6x/week with compound lifts", {
+        indent: 10,
+      });
+      doc.text("Sleep: 7-9 hours (testosterone production happens at night)", {
+        indent: 10,
+      });
+      doc.text("Zinc: 15-30mg daily (supports testosterone production)", {
+        indent: 10,
+      });
+      doc.text("Stress management: Chronic cortisol suppresses testosterone", {
+        indent: 10,
+      });
       doc.moveDown(0.2);
 
-      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Muscle-Building Protocol");
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#4a5568")
+        .text("Muscle-Building Protocol");
       doc.fontSize(9).fillColor("#111827");
-      doc.text("Calorie surplus: +300-500 above TDEE for muscle gain", { indent: 10 });
+      doc.text("Calorie surplus: +300-500 above TDEE for muscle gain", {
+        indent: 10,
+      });
       doc.text("Protein: 1.8-2.2g per kg body weight daily", { indent: 10 });
-      doc.text("Strength training: Compound movements, progressive overload", { indent: 10 });
+      doc.text("Strength training: Compound movements, progressive overload", {
+        indent: 10,
+      });
       doc.moveDown(0.2);
 
-      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("12-Week Muscle Gain Phases");
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#4a5568")
+        .text("12-Week Muscle Gain Phases");
       doc.fontSize(9).fillColor("#111827");
-      doc.text("Weeks 1-4: Strength Foundation (4-6 reps, heavy)", { indent: 10 });
-      doc.text("Weeks 5-8: Hypertrophy (8-12 reps, moderate weight)", { indent: 10 });
-      doc.text("Weeks 9-12: Volume & Deload (12-15 reps, controlled pace)", { indent: 10 });
+      doc.text("Weeks 1-4: Strength Foundation (4-6 reps, heavy)", {
+        indent: 10,
+      });
+      doc.text("Weeks 5-8: Hypertrophy (8-12 reps, moderate weight)", {
+        indent: 10,
+      });
+      doc.text("Weeks 9-12: Volume & Deload (12-15 reps, controlled pace)", {
+        indent: 10,
+      });
 
       doc.addPage();
     }
@@ -803,7 +973,7 @@ export async function generatePersonalizedPDF(
   // === ACTION PLAN ===
   addHeaderSection(
     "Your 90-Day Action Plan",
-    `${profile.name}'s Step-by-Step Implementation`
+    `${profile.name}'s Step-by-Step Implementation`,
   );
 
   doc.fontSize(11).font("Helvetica").fillColor("#111827");
@@ -837,14 +1007,16 @@ export async function generatePersonalizedPDF(
   doc.moveDown(0.3);
   doc.fontSize(10).font("Helvetica").fillColor("#111827");
   doc.text(
-    `${profile.name}, you have the evidence-based roadmap. Commit to the process, and results will follow.`
+    `${profile.name}, you have the evidence-based roadmap. Commit to the process, and results will follow.`,
   );
 
   doc.moveDown(1);
   doc.fontSize(9).fillColor("#6b7280");
-  doc.text("This blueprint is for educational purposes and not medical advice.");
   doc.text(
-    "Always consult healthcare professionals before major lifestyle changes."
+    "This blueprint is for educational purposes and not medical advice.",
+  );
+  doc.text(
+    "Always consult healthcare professionals before major lifestyle changes.",
   );
   doc.text(`Generated by Genewell Wellness • Order: ${orderId}`);
 

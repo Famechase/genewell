@@ -191,13 +191,17 @@ export default function Index() {
             </div>
             <div>
               <div className="text-3xl font-bold text-pink-600 mb-2">89%</div>
-              <div className="text-gray-600">Report Positive Changes in 30 Days</div>
+              <div className="text-gray-600">
+                Report Positive Changes in 30 Days
+              </div>
             </div>
             <div>
               <div className="text-3xl font-bold text-orange-500 mb-2">
                 4.7⭐
               </div>
-              <div className="text-gray-600">Average Rating from 8K+ Reviews</div>
+              <div className="text-gray-600">
+                Average Rating from 8K+ Reviews
+              </div>
             </div>
             <div>
               <div className="text-3xl font-bold text-emerald-500 mb-2">
@@ -393,7 +397,9 @@ export default function Index() {
                       />
                     )}
                     {product.icon === "sparkles" && (
-                      <Sparkles className={`h-6 w-6 text-${product.color}-600`} />
+                      <Sparkles
+                        className={`h-6 w-6 text-${product.color}-600`}
+                      />
                     )}
                   </div>
                   <CardTitle className="text-xl text-gray-900">
@@ -417,7 +423,9 @@ export default function Index() {
                       </span>
                     </div>
                     <Button
-                      onClick={() => handleProductClick(product.id, product.name)}
+                      onClick={() =>
+                        handleProductClick(product.id, product.name)
+                      }
                       className={`w-full bg-gradient-to-r from-${product.color}-500 to-${product.color}-600 hover:from-${product.color}-600 hover:to-${product.color}-700 text-white`}
                     >
                       <Download className="mr-2 h-4 w-4" />
@@ -462,7 +470,10 @@ export default function Index() {
                   ))}
                 </div>
                 <p className="text-gray-700 mb-4">
-                  "After years of yo-yo dieting, the Essential Blueprint showed me exactly why certain foods work for my body. I've lost 8kg in 8 weeks and maintained energy throughout the day. The meal timing advice alone was worth it!"
+                  "After years of yo-yo dieting, the Essential Blueprint showed
+                  me exactly why certain foods work for my body. I've lost 8kg
+                  in 8 weeks and maintained energy throughout the day. The meal
+                  timing advice alone was worth it!"
                 </p>
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold">
@@ -472,7 +483,9 @@ export default function Index() {
                     <div className="font-semibold text-gray-900">
                       Sneha K., 32
                     </div>
-                    <div className="text-sm text-gray-500">Mumbai, Maharashtra</div>
+                    <div className="text-sm text-gray-500">
+                      Mumbai, Maharashtra
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -489,15 +502,23 @@ export default function Index() {
                   ))}
                 </div>
                 <p className="text-gray-700 mb-4">
-                  "As a corporate professional, I had chronic bloating and low energy. The Premium Blueprint helped me understand my Pitta constitution. After implementing the recommendations, my digestion improved within 2 weeks and I'm sleeping better than ever."
+                  "As a corporate professional, I had chronic bloating and low
+                  energy. The Premium Blueprint helped me understand my Pitta
+                  constitution. After implementing the recommendations, my
+                  digestion improved within 2 weeks and I'm sleeping better than
+                  ever."
                 </p>
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full flex items-center justify-center text-white font-bold">
                     V
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900">Vikram M., 41</div>
-                    <div className="text-sm text-gray-500">Bangalore, Karnataka</div>
+                    <div className="font-semibold text-gray-900">
+                      Vikram M., 41
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      Bangalore, Karnataka
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -514,14 +535,19 @@ export default function Index() {
                   ))}
                 </div>
                 <p className="text-gray-700 mb-4">
-                  "I got the Complete Coaching plan with personal follow-ups. My coach helped me build sustainable habits rather than quick fixes. 3 months in and I've transformed my relationship with food. My family also benefited from the shared meal plans!"
+                  "I got the Complete Coaching plan with personal follow-ups. My
+                  coach helped me build sustainable habits rather than quick
+                  fixes. 3 months in and I've transformed my relationship with
+                  food. My family also benefited from the shared meal plans!"
                 </p>
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full flex items-center justify-center text-white font-bold">
                     R
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900">Ritika P., 27</div>
+                    <div className="font-semibold text-gray-900">
+                      Ritika P., 27
+                    </div>
                     <div className="text-sm text-gray-500">Delhi, NCR</div>
                   </div>
                 </div>
@@ -543,7 +569,9 @@ export default function Index() {
               Behind Your Plan
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Our AI combines evidence-based exercise science, nutrition research, sleep neurobiology, behavioral psychology, and optional DNA insights
+              Our AI combines evidence-based exercise science, nutrition
+              research, sleep neurobiology, behavioral psychology, and optional
+              DNA insights
             </p>
           </div>
 
@@ -562,7 +590,9 @@ export default function Index() {
                       Metabolic & Lifestyle Profiling
                     </h4>
                     <p className="text-gray-600">
-                      Evidence-based calculation of your basal metabolic rate, daily energy expenditure, and personalized macronutrient targets based on exercise science research.
+                      Evidence-based calculation of your basal metabolic rate,
+                      daily energy expenditure, and personalized macronutrient
+                      targets based on exercise science research.
                     </p>
                   </div>
                 </div>
