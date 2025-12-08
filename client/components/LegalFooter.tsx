@@ -295,7 +295,7 @@ export default function LegalFooter() {
           <div className="border-t border-gray-800 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
               <div className="text-sm text-gray-400">
-                © 2024 Genewell Health. All rights reserved.
+                © 2025 Genewell Health. All rights reserved.
               </div>
               <div className="flex flex-wrap justify-center gap-6 text-sm">
                 <button
