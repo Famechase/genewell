@@ -1,5 +1,11 @@
 import PDFDocument from "pdfkit";
 import { UserProfile, PersonalizationData } from "./personalization-engine";
+import {
+  generateLivePersonalizedInsights,
+  generateLiveSupplementRecommendations,
+  getLiveNutrientOptimizerPairing,
+  generateLiveMealPrepPlan,
+} from "./live-data-agent";
 
 export interface PDFGenerationOptions {
   tier: "free" | "essential" | "premium" | "coaching";
