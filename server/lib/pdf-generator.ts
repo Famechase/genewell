@@ -522,48 +522,232 @@ export async function generatePersonalizedPDF(
   doc.addPage();
 
   // === ADD-ONS ===
-  if (addOns.includes("addon_dna") || addOns.includes("addon_supplement")) {
-    addHeaderSection("Premium Add-On Content", `${profile.name}'s Enhanced Insights`);
+  if (addOns.length > 0) {
+    addHeaderSection("Premium Add-On Content", `${profile.name}'s Enhanced Analysis`);
 
     if (addOns.includes("addon_dna")) {
-      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("DNA Analysis Insights");
-      doc.fontSize(9).font("Helvetica").fillColor("#111827");
+      doc.fontSize(12).font("Helvetica-Bold").fillColor("#7c3aed").text("1. DNA Analysis Insights");
+      doc.fontSize(10).font("Helvetica").fillColor("#111827");
       doc.text(
-        "Your genetic profile reveals key optimization opportunities for personalization."
+        "Your genetic profile reveals key optimization opportunities across nutrition, training, and supplementation."
       );
-      doc.moveDown(0.2);
-      doc.text("FTO Gene (Appetite & Weight Management):");
+      doc.moveDown(0.3);
+
+      doc.text("FTO Gene (rs9939609) - Appetite & Weight Management");
+      doc.fontSize(9).fillColor("#111827");
       doc.text(
-        "  May affect hunger signals. Use structured eating times and meal prep.",
+        "Your variant affects hunger hormone sensitivity. If you carry risk alleles:",
         { indent: 20 }
       );
-      doc.text("CYP1A2 Gene (Caffeine Metabolism):");
-      doc.text("  Determines if you're a fast or slow metabolizer. Adjust timing.",
-        { indent: 20 }
-      );
-      doc.text("ACTN3 Gene (Athletic Performance):");
-      doc.text("  Influences exercise response and recovery capacity.",
-        { indent: 20 }
-      );
+      doc.text("→ Use smaller plates and meal prep portions", { indent: 20 });
+      doc.text("→ Eat more protein (25-30% of calories) for satiety", { indent: 20 });
+      doc.text("→ Avoid eating directly from bags/boxes", { indent: 20 });
       doc.moveDown(0.2);
+
+      doc.text("CYP1A2 Gene (rs762551) - Caffeine Metabolism");
+      doc.text(
+        "Determines if you're a fast or slow caffeine metabolizer:",
+        { indent: 20 }
+      );
+      doc.text("→ Fast: Can drink coffee until 4 PM without sleep disruption", { indent: 20 });
+      doc.text("→ Slow: Limit caffeine to morning only, max 100-200mg", { indent: 20 });
+      doc.moveDown(0.2);
+
+      doc.text("ACTN3 Gene (rs1815439) - Muscle Fiber Type & Performance");
+      doc.text(
+        "Influences your natural athletic response pattern:",
+        { indent: 20 }
+      );
+      doc.text("→ RR variant: Better for endurance (prioritize aerobic training)", { indent: 20 });
+      doc.text("→ XX variant: Better for strength (prioritize resistance training)", { indent: 20 });
+      doc.moveDown(0.2);
+
+      doc.text("MTHFR Gene (C677T) - Folate & Methylation");
+      doc.text("Affects how efficiently you process B vitamins:", { indent: 20 });
+      doc.text("→ Take methylfolate (not folic acid)", { indent: 20 });
+      doc.text("→ Supplement with methylcobalamin (B12)", { indent: 20 });
+      doc.moveDown(0.3);
+
       doc.fontSize(8).fillColor("#6b7280");
-      doc.text("Important: Genes are not destiny. Lifestyle choices override genetics.");
+      doc.text("Note: Genes provide 20% of the equation. Environment and behavior control 80%.");
 
       doc.addPage();
     }
 
     if (addOns.includes("addon_supplement")) {
-      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Advanced Supplement Analysis");
-      doc.fontSize(9).font("Helvetica").fillColor("#111827");
+      doc.fontSize(12).font("Helvetica-Bold").fillColor("#7c3aed").text("2. 12-Week Supplement Protocol");
+      doc.fontSize(10).font("Helvetica").fillColor("#111827");
       doc.text(
-        "This add-on includes a comprehensive 12-week supplement protocol based on your deficiencies."
+        "A periodized, evidence-based supplement strategy based on your quiz data and goals."
       );
+      doc.moveDown(0.3);
+
+      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Phase 1: Loading (Weeks 1-4)");
+      doc.fontSize(9).fillColor("#111827");
+      doc.text("Foundation building — establish consistent supplementation:");
+      addBulletPoint("Vitamin D3: 4000 IU daily (morning)", 20);
+      addBulletPoint("Omega-3 (fish oil): 2-3g EPA+DHA daily (with meals)", 20);
+      addBulletPoint("Magnesium Glycinate: 300mg before bed", 20);
+      doc.moveDown(0.1);
+      doc.fontSize(8).fillColor("#6b7280");
+      doc.text("Goal: Establish baseline, test tolerance, build habit");
+
       doc.moveDown(0.2);
-      doc.text("Included:");
-      addBulletPoint("Deficiency testing interpretation", 20);
-      addBulletPoint("Periodized 12-week protocol (loading, maintenance, deload)", 20);
-      addBulletPoint("Brand recommendations & vendor guides", 20);
-      addBulletPoint("Timing & stacking strategy", 20);
+      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Phase 2: Optimization (Weeks 5-8)");
+      doc.fontSize(9).fillColor("#111827");
+      doc.text("Add performance-specific supplements:");
+      addBulletPoint("Add Creatine Monohydrate: 5g daily (if training hard)", 20);
+      addBulletPoint("Add Zinc: 25-30mg with dinner (recovery, hormones)", 20);
+      addBulletPoint("L-Theanine: 100-200mg as needed for stress", 20);
+
+      doc.moveDown(0.2);
+      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Phase 3: Refinement (Weeks 9-12)");
+      doc.fontSize(9).fillColor("#111827");
+      doc.text("Assess what works, drop what doesn't:");
+      addBulletPoint("Keep: What improved energy, sleep, or performance", 20);
+      addBulletPoint("Drop: Any that caused side effects or no benefit", 20);
+      addBulletPoint("Retest: Blood work (repeat 6-week tests)", 20);
+
+      doc.moveDown(0.3);
+      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Brand Recommendations");
+      doc.fontSize(9).fillColor("#111827");
+      doc.text("Verified brands with 3rd-party testing (USP/NSF):");
+      doc.text("• Vitamin D3: Pure Encapsulations, NOW Foods, iHerb");
+      doc.text("• Omega-3: Optimum Nutrition, NOW Foods, Nordic Naturals");
+      doc.text("• Magnesium: Pure Encapsulations, Thorne, Designs for Health");
+      doc.text("• Creatine: Optimum Nutrition, MyProtein, MuscleTech");
+
+      doc.addPage();
+    }
+
+    if (addOns.includes("addon_athlete")) {
+      doc.fontSize(12).font("Helvetica-Bold").fillColor("#7c3aed").text("3. Athletic Performance Add-On");
+      doc.fontSize(10).font("Helvetica").fillColor("#111827");
+      doc.text(
+        "Sport-specific training, energy system development, and competition fuel strategy."
+      );
+      doc.moveDown(0.3);
+
+      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("12-Week Periodization");
+      doc.fontSize(9).fillColor("#111827");
+      doc.text("Weeks 1-4: Base Building");
+      doc.text("  5-6 training days/week, moderate intensity (70% max effort)", { indent: 10 });
+      doc.text("  Focus: Aerobic base, technique refinement", { indent: 10 });
+      doc.moveDown(0.1);
+
+      doc.text("Weeks 5-8: Intensity Addition");
+      doc.text(
+        "  2-3 high-intensity interval sessions + 3 moderate sessions",
+        { indent: 10 }
+      );
+      doc.text("  Focus: VO2max, lactate threshold, power", { indent: 10 });
+      doc.moveDown(0.1);
+
+      doc.text("Weeks 9-12: Competition Preparation");
+      doc.text(
+        "  Sport-specific skills, competition simulation, peak tapering",
+        { indent: 10 }
+      );
+      doc.text("  Focus: Race-specific pacing, mental preparation", { indent: 10 });
+
+      doc.moveDown(0.3);
+      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Fueling Strategy");
+      doc.fontSize(9).fillColor("#111827");
+      doc.text("Before training (1-2 hours before):");
+      doc.text("  Carbs + small protein: banana + almonds or toast + peanut butter", { indent: 10 });
+      doc.moveDown(0.1);
+
+      doc.text("During training (if >90 min):");
+      doc.text("  Sports drink: 30-60g carbs/hour", { indent: 10 });
+      doc.text("  Electrolytes: 500-700mg sodium for sweat loss", { indent: 10 });
+      doc.moveDown(0.1);
+
+      doc.text("After training (within 30 min):");
+      doc.text("  Protein + carbs: 20-40g protein + 1-1.2g/kg carbs", { indent: 10 });
+
+      doc.addPage();
+    }
+
+    if (addOns.includes("addon_family")) {
+      doc.fontSize(12).font("Helvetica-Bold").fillColor("#7c3aed").text("4. Family Nutrition Plan");
+      doc.fontSize(10).font("Helvetica").fillColor("#111827");
+      doc.text(
+        "This add-on customizes meal plans for up to 4 family members while keeping grocery shopping efficient."
+      );
+      doc.moveDown(0.3);
+
+      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("How This Works");
+      doc.fontSize(9).fillColor("#111827");
+      doc.text("Each family member gets their own custom plan based on:");
+      doc.text("  • Age, gender, health status, and fitness level", { indent: 10 });
+      doc.text("  • Dietary preferences and restrictions", { indent: 10 });
+      doc.text("  • Personal health goals", { indent: 10 });
+      doc.moveDown(0.2);
+
+      doc.text("Shared family benefits:");
+      doc.text("  • One master grocery list (everyone's needs combined)", { indent: 10 });
+      doc.text("  • Recipes with portions for each member", { indent: 10 });
+      doc.text("  • Efficiency: Cook once, serve personalized portions", { indent: 10 });
+
+      doc.addPage();
+    }
+
+    if (addOns.includes("addon_women_hormone")) {
+      doc.fontSize(12).font("Helvetica-Bold").fillColor("#7c3aed").text("5. Women's Hormonal Health");
+      doc.fontSize(10).font("Helvetica").fillColor("#111827");
+      doc.text("Menstrual cycle-synced nutrition, PCOS/thyroid support, and cycle-aware training.");
+      doc.moveDown(0.3);
+
+      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Follicular Phase (Days 1-14)");
+      doc.fontSize(9).fillColor("#111827");
+      doc.text("Higher estrogen = Better carb tolerance");
+      doc.text("Nutrition: Higher carbs (50% of calories), moderate protein/fat", { indent: 10 });
+      doc.text("Training: Best time for strength & high-intensity workouts", { indent: 10 });
+      doc.moveDown(0.2);
+
+      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Luteal Phase (Days 15-28)");
+      doc.fontSize(9).fillColor("#111827");
+      doc.text("Higher progesterone = Reduced carb tolerance, higher calorie needs");
+      doc.text("Nutrition: Higher fat (30-35%), moderate carbs, higher protein", { indent: 10 });
+      doc.text("Training: Lower intensity, recovery-focused (yoga, walks)", { indent: 10 });
+      doc.moveDown(0.2);
+
+      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Women-Specific Supplements");
+      doc.fontSize(9).fillColor("#111827");
+      doc.text("Iron: Monitor after menstruation (especially if heavy flow)", { indent: 10 });
+      doc.text("Magnesium: 400mg/day, especially luteal phase for PMS", { indent: 10 });
+      doc.text("B vitamins: Energy and mood, especially B6 & B12", { indent: 10 });
+      doc.text("Omega-3: 2-3g/day for hormone balance and inflammation", { indent: 10 });
+
+      doc.addPage();
+    }
+
+    if (addOns.includes("addon_men_fitness")) {
+      doc.fontSize(12).font("Helvetica-Bold").fillColor("#7c3aed").text("6. Men's Fitness Optimization");
+      doc.fontSize(10).font("Helvetica").fillColor("#111827");
+      doc.text("Testosterone optimization, muscle-building framework, and strength progression.");
+      doc.moveDown(0.3);
+
+      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Testosterone Optimization");
+      doc.fontSize(9).fillColor("#111827");
+      doc.text("Heavy resistance training: 3-6x/week with compound lifts", { indent: 10 });
+      doc.text("Sleep: 7-9 hours (testosterone production happens at night)", { indent: 10 });
+      doc.text("Zinc: 15-30mg daily (supports testosterone production)", { indent: 10 });
+      doc.text("Stress management: Chronic cortisol suppresses testosterone", { indent: 10 });
+      doc.moveDown(0.2);
+
+      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("Muscle-Building Protocol");
+      doc.fontSize(9).fillColor("#111827");
+      doc.text("Calorie surplus: +300-500 above TDEE for muscle gain", { indent: 10 });
+      doc.text("Protein: 1.8-2.2g per kg body weight daily", { indent: 10 });
+      doc.text("Strength training: Compound movements, progressive overload", { indent: 10 });
+      doc.moveDown(0.2);
+
+      doc.fontSize(10).font("Helvetica-Bold").fillColor("#4a5568").text("12-Week Muscle Gain Phases");
+      doc.fontSize(9).fillColor("#111827");
+      doc.text("Weeks 1-4: Strength Foundation (4-6 reps, heavy)", { indent: 10 });
+      doc.text("Weeks 5-8: Hypertrophy (8-12 reps, moderate weight)", { indent: 10 });
+      doc.text("Weeks 9-12: Volume & Deload (12-15 reps, controlled pace)", { indent: 10 });
 
       doc.addPage();
     }
