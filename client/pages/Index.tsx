@@ -224,7 +224,7 @@ export default function Index() {
               Begins
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Our AI analyzes 17+ lifestyle factors to create your unique
+              Our AI analyzes 25+ lifestyle factors to create your unique
               wellness blueprint
             </p>
           </div>
